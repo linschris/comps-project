@@ -1,0 +1,8 @@
+# data contains .tfrecord files
+data
+labeled_data/
+__pycache__/
+.DS_Store
+vocab.csv
+# old contains code that may/may not be used
+old/
