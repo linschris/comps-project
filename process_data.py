@@ -7,15 +7,7 @@ from requests_futures.sessions import FuturesSession
 from concurrent.futures import as_completed
 
 
-def grab_and_split_data(
-    train_file_dir: str, 
-    test_file_dir: str, 
-    validation_file_dir: str = None, 
-    train_valid_split: float = 0.9
-) -> dict:
-    # Takes in directories of .tfrecord files and returns lists of .tfrecord file paths
-    # If any directory is invalid, glob() will raise errors
-    print(f"{train_file_dir}/*.tfrecord", f"{test_file_dir}/*.tfrecord")
+def grab_tf_record_filepaths(train_file_dir: str, test_file_dir: str, validation_file_dir: str = None, train_valid_split: float = 0.9) -> dict:
     train_file_paths = tf.io.gfile.glob(f"{train_file_dir}/*.tfrecord")
     test_file_paths = tf.io.gfile.glob(f"{test_file_dir}/*.tfrecord")
     if not validation_file_dir:
@@ -27,12 +19,13 @@ def grab_and_split_data(
 
     return { "train_files": train_file_paths, "test_files": test_file_paths, "validation_files": validation_file_paths }
 
-def view_tf_records(tf_records: list, num_records: int = None) -> None:
+def parse_tf_records(tf_records: list, num_records: int = None) -> tuple:
     tf_record_data = {}
     yt_id_reqs = []
-    session = FuturesSession()
+    session = FuturesSession(max_workers=8) # Allows for YouTube IDs to be fetched asynchronously
     raw_dataset = tf.data.TFRecordDataset(tf_records)
     raw_dataset = raw_dataset.take(num_records) if num_records else raw_dataset
+
     for raw_record in raw_dataset:
         curr_tensors = tf.io.parse_single_example(
             raw_record, 
@@ -44,7 +37,7 @@ def view_tf_records(tf_records: list, num_records: int = None) -> None:
         fake_video_id = curr_tensors['id'].numpy()[0].decode("utf-8")
         video_labels = list(curr_tensors["labels"].values.numpy())
         tf_record_data[fake_video_id] = video_labels
-        yt_id_reqs.append(get_yt_id(fake_video_id, session))
+        yt_id_reqs.append(create_yt_id_request(fake_video_id, session))
     
     with FuturesSession(session=session) as sess:
         for future in as_completed(yt_id_reqs):
@@ -55,18 +48,12 @@ def view_tf_records(tf_records: list, num_records: int = None) -> None:
                 video_labels = tf_record_data[fake_id]
                 tf_record_data[yt_id] = [video_labels]
                 tf_record_data[yt_id].append(download_yt_thumbnail(yt_id))
-                # print(tf_record_data[yt_id])
             del tf_record_data[fake_id]
-            
 
-
-
-
-    return create_data(tf_record_data)
+    return create_cnn_datapoints(tf_record_data)
     
-
-def get_yt_id(fake_id: str, session) -> str:
-    '''Grabs YouTube ID from fake-generated id'''
+def create_yt_id_request(fake_id: str, session) -> str:
+    '''Grabs YouTube ID from fake-generated id, and returns the request'''
     url_str = f"http://data.yt8m.org/2/j/i/{fake_id[0:2]}/{fake_id}.js"
     r = session.get(url_str)
     return r
@@ -77,41 +64,33 @@ def download_yt_thumbnail(yt_id: str) -> None:
     if not any(os.path.exists(download_path + extension) for extension in possible_extensions):
         yt_url = f"http://www.youtube.com/watch?v={yt_id}"
         try:
-            output = subprocess.run(f"youtube-dl --write-thumbnail --skip-download {yt_url} -o {download_path}", capture_output=True)
-            print(output.output)
-        except:
-            print(f"Error with downloading thumbnail from URL: {yt_url}")
+            subprocess.Popen(f"youtube-dl --write-thumbnail --skip-download {yt_url} -o {download_path}", shell=True)
+        except Exception as e:
+            print(f"Error with downloading thumbnail from URL: {yt_url} with error: {e}")
     return download_path
 
-def convert_num_to_str_labels():
-    pass
-
-def convert_labels(labels):
-    # Increase length by adding 0s (0-3861 as possible category)
+def create_labels_array(labels):
+    '''Convert numbered labels to array of size 3862, with the indices (of the numbers) as 1s'''
     new_labels = [[0] * 3862 for i in range(len(labels))]
     for i in range(len(labels)):
         for j in range(len(labels[i])):
             new_labels[i][labels[i][j]] = 1
     return new_labels
 
-def convert_to_jpg(file_path: str) -> str:
-    pass
-
-
-
-
-def create_data(tf_data: dict, img_size: int = 256) -> tuple:
+def create_cnn_datapoints(tf_data: dict, img_size: int = 256) -> tuple:
+    ''' 
+        Creates a tuple of the YouTube thumbnail img array and corresponding human labels, which
+        will act as a datapoint for the CNN to learn from. 
+    '''
     x, y = [], []
     possible_extensions = [".jpg", ".webp", ".png"]
     img_array = None
-    for video_id, data in tf_data.items():
+    for data in tf_data.values():
         labels, img_path = data[0], data[1]
-        # print(video_id, labels, img_path)
         for extension in possible_extensions:
             # As we don't know what type of image youtube-dl downloads, we'll 
             # test possible extensions and break if it works
             try:
-                # print("Trying ", img_path + extension)
                 img_array = cv2.imread(img_path + extension)
                 resized_img = cv2.resize(img_array, (img_size, img_size))
                 break
@@ -126,10 +105,11 @@ def create_data(tf_data: dict, img_size: int = 256) -> tuple:
     x = x.astype('float32')
     x /= 255
 
-    y = np.array(convert_labels(y))
+    y = np.array(create_labels_array(y))
     return x, y
 
 def main():
+    pass
     # filepaths = grab_and_split_data(
     #     "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/video/train",
     #     "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/video/test",
@@ -137,7 +117,8 @@ def main():
     # )
     # print(filepaths)
     # view_tf_records(filepaths["validation_files"], 2)
-    download_yt_thumbnail("dg45mfgd4")
+    # download_yt_thumbnail("dg45mfgd4")
+    # load_data("./labeled_data")
 
 
 
