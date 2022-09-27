@@ -6,3 +6,5 @@ __pycache__/
 vocab.csv
 # old contains code that may/may not be used
 old/
+openimages/
+rcnn.py
