@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from numpy import dot
 from numpy.linalg import norm
 import glob
+from process_tf_record_data import *
 
 
 class AlteredXception:
@@ -48,6 +49,9 @@ class AlteredXception:
         new_model = Model(model_input, last_output)
         return new_model
 
+    def save_predictions(self, predictions):
+        pass
+
     def cluster_images(self):
         condensed_fv = self.grab_all_feature_vectors()
         kmeans = KMeans(n_clusters=10)
@@ -80,7 +84,8 @@ class AlteredXception:
             plt.show()
 
     def grab_all_feature_vectors(self):
-        self.image_paths = glob.glob(self.image_dir)  # TODO: change here
+        self.image_paths = glob.glob(
+            self.image_dir + "/*")  # TODO: change here
         loaded_images = []
         curr_index = 0
         while curr_index < self.num_images:
@@ -112,6 +117,7 @@ class AlteredXception:
 
     def get_max_feature_vectors(self, images):
         '''Grabs K feature maps from output of CNN per image, where K is the number of total filters applied on the image.'''
+        feature_maps = self.model.predict(images)
         max_feature_vectors = []
         for image in images:
             curr_feature_map = self.model.predict(image)
@@ -166,7 +172,8 @@ class AlteredXception:
         return normalized_feature_map
 
 
-model = AlteredXception("/Users/lchris/Desktop/labeled_data")
+model = AlteredXception("/Users/lchris/Desktop/labeled_data",
+                        output_layer_name="block14_sepconv2")
 with cProfile.Profile() as pr:
     model.cluster_images()
 

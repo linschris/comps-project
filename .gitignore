@@ -1,5 +1,6 @@
 # data contains .tfrecord files
 data
+tfrecords
 labeled_data/
 __pycache__/
 .DS_Store
@@ -8,3 +9,4 @@ vocab.csv
 old/
 openimages/
 rcnn.py
+.vscode/
