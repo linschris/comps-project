@@ -16,32 +16,25 @@ query_image_path = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/da
 with cProfile.Profile() as pr:
     db = Database(os.path.join(download_dir, "predictions.json"))
     model = AlteredXception(db)
-    image_paths, image_vectors = model.grab_all_feature_vectors(
-        "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/thumbnails", 30)
-    query_img_vector = model.grab_image_feature_vector(query_image_path)
+    image_paths, loaded_images = model.grab_images_and_paths(
+        "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/thumbnails", 10000)
+    query_img = model.get_and_resize_image(query_image_path)
+    np.append(loaded_images, query_img)
 
+    condensed_fv = model.get_avg_feature_vectors(loaded_images)
+    db.store_predictions(condensed_fv, image_paths)
+    condensed_query_img_fv = condensed_fv[-1].reshape(1, -1)
     min_dist = float('inf')
     min_image_path = None
-    # img_vectors = model.db.predictions
-    # i = 0
-    for i in range(0, len(image_paths)):
-        curr_vector = image_vectors[i]
+    for i in range(0, len(condensed_fv)-1):
+        curr_vector = condensed_fv[i].reshape(1, -1)
         curr_image_path = image_paths[i]
         curr_dist = sklearn.metrics.pairwise.euclidean_distances(
-            np.array(curr_vector).reshape(1, -1), query_img_vector.reshape(1, -1))
+            curr_vector, condensed_query_img_fv)
         if curr_dist < min_dist:
             print(min_dist, min_image_path)
             min_dist = curr_dist
             min_image_path = curr_image_path
-
-    # for image_path, curr_vector in img_vectors.items():
-    #     curr_dist = sklearn.metrics.pairwise.euclidean_distances(
-    #         np.array(curr_vector).reshape(1, -1), query_img_vector.reshape(1, -1))
-    #     if curr_dist < min_dist:
-    #         print(min_dist, min_image_path)
-    #         min_dist = curr_dist
-    #         min_image_path = image_path
-
     plt.imshow(cv2.imread(query_image_path))
     plt.show()
     plt.imshow(cv2.imread(min_image_path))

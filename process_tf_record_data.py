@@ -109,7 +109,7 @@ def download_yt_thumbnail(yt_id: str, download_dir: str) -> list:
         try:
             # download thumbnail and video
             # --skip-download for thumbnail DL
-            # 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            # format can be 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             th = subprocess.Popen(
                 f"yt-dlp --write-thumbnail --skip-download {yt_url} -o {download_thumbnail_path}", shell=True)
             v = subprocess.Popen(
