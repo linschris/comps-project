@@ -63,7 +63,8 @@ class AlteredXception:
         curr_image = self.get_and_resize_image(image_path)
         return self.get_avg_feature_vectors(curr_image)
 
-    def grab_all_image_paths(self, image_dir, num_images):
+    @staticmethod
+    def grab_all_image_paths(image_dir, num_images):
         image_paths = []
         extensions = ('/*.jpg', '/*.webp', '/*.png')
         for extension in extensions:
