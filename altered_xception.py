@@ -76,20 +76,21 @@ class AlteredXception:
     def grab_images_and_paths(self, image_dir, num_images=None):
         loaded_images = []
         curr_index, num_loaded_images = 0, 0
-        curr_image_paths = self.grab_all_image_paths(image_dir, num_images)
+        curr_image_paths = self.grab_all_image_paths(image_dir, None)
         while (not num_images or num_loaded_images < num_images) and curr_index < len(curr_image_paths):
             curr_image_path = curr_image_paths[curr_index]
-            # if curr_image_path not in self.db.predictions:
-            try:
-                curr_image = self.get_and_resize_image(curr_image_path)
-                loaded_images.append(curr_image)
-                num_loaded_images += 1
-            except:
-                # if os.path.exists(curr_image_path):
-                #     os.remove(curr_image_path)
-                curr_image_paths.remove(curr_index)
-                continue
-            curr_index += 1
+            if curr_image_path not in self.db.predictions:
+                try:
+                    curr_image = self.get_and_resize_image(curr_image_path)
+                    loaded_images.append(curr_image)
+                    num_loaded_images += 1
+                except:
+                    # if os.path.exists(curr_image_path):
+                    #     os.remove(curr_image_path)
+                    continue
+                curr_index += 1
+            else:
+                curr_image_paths.pop(curr_index)
         if num_loaded_images <= 0:
             raise ValueError(f"No images could be found in {image_dir}.")
         loaded_images = np.concatenate(loaded_images, axis=0)

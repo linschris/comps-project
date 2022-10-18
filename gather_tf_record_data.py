@@ -5,7 +5,7 @@ from concurrent.futures import as_completed
 from urllib.request import urlopen
 import os
 
-data_type = "train"  # train, test, validate
+data_type = "test"  # train, test, validate
 part = "video"  # video, frame, segment
 
 r = requests.get(
@@ -15,7 +15,8 @@ soup = BeautifulSoup(data)
 for link in soup.find_all('a'):
     tf_record_full_name = link.get('href')
     tf_record_name = tf_record_full_name.split(".")[0]
-    if not os.path.exists(f"./data/{data_type}/{tf_record_name}.tfrecord"):
+    if not os.path.exists(f"./tfrecords/{part}/{data_type}/{tf_record_name}.tfrecord"):
+        print(f"Grabbing {tf_record_name}.tfrecord")
         curr_response = requests.get(
             f"http://storage.googleapis.com/us.data.yt8m.org/2/{part}/{data_type}/{tf_record_name}.tfrecord")
         with open(f"./tfrecords/{part}/{data_type}/{tf_record_name}.tfrecord", "wb") as f:

@@ -44,28 +44,32 @@ def query_image(query_img_path, db, k=5):
     box_ids, scores, bboxes = net(x)
     query_object_info = get_object_info(bboxes[0], scores[0],
                                         box_ids[0], class_names=net.classes)
+    if len(query_object_info[0]) <= 0:
+        raise ValueError("Invalid image. No object classes could be found.")
+    print(query_object_info[0])
     scores_and_images = []
     for image_path, db_obj_info in db.object_predictions.items():
         curr_score = 0
         num_category_matches = 0
-        if type(db_obj_info["class_names"]) == dict:
+        if type(db_obj_info["class_names"]) == dict and len(db_obj_info["class_names"]) > 0:
             for obj_class, num in db_obj_info["class_names"].items():
                 if obj_class in query_object_info[0]:
                     num_category_matches += 1
                     curr_score += num
-        scores_and_images.append(
-            [image_path, curr_score * num_category_matches])
-    return sorted(scores_and_images, key=lambda x: x[1], reverse=True)[0:k]
+        if curr_score > 0:
+            # print(image_path, curr_score, num_category_matches)
+            scores_and_images.append([image_path, curr_score, num_category_matches])
+    return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
 
 
 def save_object_predictions(image_dir, database, num_images=None):
-    # net = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
     net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True)
     image_paths = AlteredXception.grab_all_image_paths(image_dir, None)
     object_infos = []
+    loaded_image_paths = []
     num_loaded_predictions = 0
     for image_path in image_paths:
-        if image_path[-4:-1] == ".jp" and image_path not in db.object_predictions:
+        if image_path[-4:-1] == ".jp" and image_path not in database.object_predictions:
             x, orig_img = data.transforms.presets.rcnn.load_test(
                 image_path)
             box_ids, scores, bboxes = net(x)
@@ -75,16 +79,5 @@ def save_object_predictions(image_dir, database, num_images=None):
             if num_loaded_predictions > num_images:
                 break
             object_infos.append(curr_process)
-    database.store_object_data(image_paths, object_infos)
-
-
-with cProfile.Profile() as pr:
-    query_img_path = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/biking3.jpg"
-    download_dir = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data"
-    db = Database(download_dir)
-    save_object_predictions(
-        "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/thumbnails", db, 10)
-
-stats = pstats.Stats(pr)
-stats.sort_stats(pstats.SortKey.TIME)
-stats.dump_stats(filename='needs_profiling.prof')
+            loaded_image_paths.append(image_path)
+    database.store_object_data(object_infos, loaded_image_paths)
