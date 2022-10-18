@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: whitesmoke;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#header {
+    text-align: center;
+}
+
+#image-upload-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#image-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+#image-preview > img {
+    /* Maintain aspect ratio while keeping a maximum size */
+    max-width: 400px;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+}
+
+#yt-embed-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 0.5rem;
+}

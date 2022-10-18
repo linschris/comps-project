@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Related Videos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+  </head>
+  <body>
+    <div id="header">
+      <h1>YouTube Image Search</h1>
+      <h3>Find YouTube Videos All Through Images!</h3>
+    </div>
+    <form id="image-upload-form" method="post" enctype="multipart/form-data">
+      <input type="file" name="imagefile" id="imagefile"/>
+      <input type="submit" />
+    </form>
+    {% if file_url %}
+        <div id="image-preview">
+            <img src="{{ file_url }}" />
+            <h3 style="text-align: center;">Predicting...</h3>
+        </div>
+    {% endif %}
+    {% if yt_links %}
+      <h4 style="text-align: center;">Found (Most To Least Related):</h4>
+      <div id="yt-embed-links">
+        {% for link in yt_links %}
+            <iframe src="{{link}}" width="500" height="300" frameborder="0"></iframe>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </body>
+</html>
+
