@@ -1,6 +1,6 @@
 import cProfile
 import pstats
-from faster_r_cnn import query_image
+from models.faster_r_cnn import query_image
 from database import Database
 
 

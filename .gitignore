@@ -4,8 +4,7 @@ data/test-frames
 data/thumbnails
 data/videos
 tfrecords
-interface/*.csv
-interface/*.npy
+interface/static/images
 labeled_data/
 __pycache__/
 .DS_Store
@@ -13,5 +12,5 @@ vocab.csv
 # old contains code that may/may not be used
 old/
 openimages/
-rcnn.py
 .vscode/
+needs_profiling.prof
