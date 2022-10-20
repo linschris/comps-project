@@ -25,8 +25,8 @@ body {
 
 #image-preview > img {
     /* Maintain aspect ratio while keeping a maximum size */
-    max-width: 400px;
-    max-height: 400px;
+    max-width: 600px;
+    max-height: 600px;
     width: auto;
     height: auto;
 }

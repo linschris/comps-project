@@ -64,37 +64,35 @@ class AlteredXception:
         return self.get_avg_feature_vectors(curr_image)
 
     @staticmethod
-    def grab_all_image_paths(image_dir, num_images):
+    def grab_all_image_paths(image_dir):
         image_paths = []
         extensions = ('/*.jpg', '/*.webp', '/*.png')
         for extension in extensions:
             image_paths.extend(glob.glob(image_dir + extension))
-        if type(num_images) == int and num_images > 0:
-            return image_paths[:num_images]
         return image_paths
 
     def grab_images_and_paths(self, image_dir, num_images=None):
         loaded_images = []
+        loaded_image_paths = []
         curr_index, num_loaded_images = 0, 0
-        curr_image_paths = self.grab_all_image_paths(image_dir, None)
+        curr_image_paths = self.grab_all_image_paths(image_dir)
         while (not num_images or num_loaded_images < num_images) and curr_index < len(curr_image_paths):
             curr_image_path = curr_image_paths[curr_index]
-            if curr_image_path not in self.db.predictions:
+            if curr_image_path not in self.db.prediction_image_paths:
                 try:
                     curr_image = self.get_and_resize_image(curr_image_path)
                     loaded_images.append(curr_image)
+                    loaded_image_paths.append(curr_image_path)
                     num_loaded_images += 1
                 except:
-                    # if os.path.exists(curr_image_path):
-                    #     os.remove(curr_image_path)
-                    continue
+                    pass
                 curr_index += 1
             else:
                 curr_image_paths.pop(curr_index)
         if num_loaded_images <= 0:
             raise ValueError(f"No images could be found in {image_dir}.")
         loaded_images = np.concatenate(loaded_images, axis=0)
-        return curr_image_paths, loaded_images
+        return loaded_image_paths, loaded_images
 
     def get_avg_feature_vectors(self, images, postprocess=False):
         # NOTE: this function should be used if the final layer in the Xception model is the avg. pool layer! Otherwise, use get_image_feature_maps()

@@ -1,6 +1,7 @@
 import tempfile
 from flask import Flask, render_template, request
 import sys
+import os
 sys.path.append('..')
 from database import Database
 from query import query_the_image
@@ -18,8 +19,9 @@ def upload_image():
         imagefile = request.files['imagefile'].read()
         im_request_file = request.files.get('imagefile', '')
         ext = '.' + im_request_file.filename.split('.')[1]
-        with tempfile.NamedTemporaryFile(suffix=ext, mode='w+b', dir="./static/images", delete=True) as temp_img_file:
+        with tempfile.NamedTemporaryFile(suffix=ext, mode='w+b', dir="./static/images", delete=False) as temp_img_file:
             temp_img_file.write(imagefile)
+            file_url = os.path.relpath(temp_img_file.name)
             top_yt_links = query_the_image(temp_img_file.name, db, 10)
     return render_template('index.html', file_url=file_url, yt_links=top_yt_links)
     

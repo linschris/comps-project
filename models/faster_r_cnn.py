@@ -3,13 +3,8 @@ from multiprocessing import Pool
 from matplotlib import pyplot as plt
 from gluoncv import model_zoo, data, utils
 import mxnet as mx
-import subprocess
-import os
 from database import Database
-from altered_xception import AlteredXception
-import pstats
-import concurrent.futures
-
+from data.models.altered_xception import AlteredXception
 
 def get_object_info(bboxes, scores=None, labels=None, thresh=0.5,
                     class_names=None):
