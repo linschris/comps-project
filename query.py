@@ -1,15 +1,25 @@
 import cProfile
 import pstats
-from models.faster_r_cnn import query_image
+import numpy
+from altered_xception import AlteredXception
 from database import Database
 
 
-def query_img_by_similar_objects(query_img_path, db):
-    return query_image(query_img_path, db)
+# def query_img_by_similar_objects(query_img_path, db):
+    
+#     return query_image(query_img_path, db)
 
 
-def query_img_by_visual_similarity(query_img_path, db):
-    pass
+def query_img_by_visual_similarity(query_img_path, model):
+    '''Bad: purely to see how well this does.'''
+    query_fv = model.grab_image_feature_vector(query_img_path)
+    distances = []
+    for image_path, index in model.db.prediction_image_paths.items():
+        curr_index = model.db.prediction_image_paths[image_path]
+        curr_fv = model.db.predictions[curr_index]
+        dist = numpy.linalg.norm(query_fv - curr_fv)
+        distances.append([image_path, dist])    
+    return sorted(distances, key=lambda x: x[1])
 
 
 def get_youtube_urls(image_scores):
@@ -74,16 +84,18 @@ def convert_to_embed_links(yt_urls):
         yt_urls[i] = yt_urls[i].replace("https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/")
         yt_urls[i] = yt_urls[i].replace("&t=", "?start=")
 
-def query_the_image(query_img_path, db, k=5):
-    image_scores = query_image(query_img_path, db)
+def query_the_image(query_img_path, model, db, k=5):
+    image_scores = query_img_by_visual_similarity(query_img_path, model)
     yt_urls = get_youtube_urls(image_scores)[0:k]
-    # convert_to_embed_links(yt_urls)
+    convert_to_embed_links(yt_urls)
     return yt_urls
 
 # with cProfile.Profile() as pr:
-#     download_dir = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data"
-#     image_scores = query_img_by_similar_objects(
-#         "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/biking3.jpg", db)
+#     download_dir = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/predictions"
+#     db = Database(download_dir)
+#     model = AlteredXception(db)
+#     image_scores = query_img_by_visual_similarity(
+#         "/Users/lchris/Desktop/Taka_Shiba.jpeg", model)
 #     print(get_youtube_urls(image_scores))
 
 # stats = pstats.Stats(pr)

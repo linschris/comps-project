@@ -1,10 +1,7 @@
-import cProfile
-from multiprocessing import Pool
-from matplotlib import pyplot as plt
-from gluoncv import model_zoo, data, utils
+# from matplotlib import pyplot as plt
+from gluoncv import model_zoo, data
 import mxnet as mx
-from database import Database
-from data.models.altered_xception import AlteredXception
+from altered_xception import AlteredXception
 
 def get_object_info(bboxes, scores=None, labels=None, thresh=0.5,
                     class_names=None):

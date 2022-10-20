@@ -1,12 +1,7 @@
-import cProfile
-import os
-import pstats
 import keras.applications.xception
 from keras.models import Model
 import cv2
 import numpy as np
-import h5py
-import pandas as pd
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -14,9 +9,7 @@ import matplotlib.pyplot as plt
 from numpy import dot
 from numpy.linalg import norm
 import glob
-from process_tf_record_data import *
-from sklearn.cluster import SpectralClustering
-from sklearn.cluster import AgglomerativeClustering
+
 
 
 class AlteredXception:
