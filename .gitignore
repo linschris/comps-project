@@ -4,6 +4,8 @@ data/test-frames
 data/thumbnails
 data/videos
 tfrecords
+interface/*.csv
+interface/*.npy
 labeled_data/
 __pycache__/
 .DS_Store
