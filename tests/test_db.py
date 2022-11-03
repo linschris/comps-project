@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 import unittest
 import numpy
-from models.altered_xception import AlteredXception
+from altered_xception import AlteredXception
 from database import Database
 
 

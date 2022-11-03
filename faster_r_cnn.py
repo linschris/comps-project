@@ -1,7 +1,35 @@
-# from matplotlib import pyplot as plt
 from gluoncv import model_zoo, data
 import mxnet as mx
-from altered_xception import AlteredXception
+from database import Database
+from utils import grab_all_image_paths
+
+class FasterRCNN:
+    def __init__(self, db: Database):
+        self.database = db
+        self.model = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
+    
+    def __call__(self, query_img_path):
+        return self.query_image_by_objects(query_img_path)
+
+    def query_image_by_objects(self, query_img_path, k=5):
+        x, query_img = data.transforms.presets.rcnn.load_test(query_img_path)
+        box_ids, scores, bboxes = self.model(x)
+        query_object_info = get_object_info(bboxes[0], scores[0],
+                                            box_ids[0], class_names=self.model.classes)
+        if len(query_object_info[0]) <= 0:
+            raise ValueError("Invalid image. No object classes could be found.")
+        scores_and_images = []
+        for image_path, db_obj_info in self.database.object_predictions.items():
+            curr_score = 0
+            num_category_matches = 0
+            if isinstance(db_obj_info["class_names"], dict) and len(db_obj_info["class_names"]) > 0:
+                for obj_class, num in db_obj_info["class_names"].items():
+                    if obj_class in query_object_info[0]:
+                        num_category_matches += 1
+                        curr_score += num
+            if curr_score > 0:
+                scores_and_images.append([image_path, curr_score, num_category_matches])
+        return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
 
 def get_object_info(bboxes, scores=None, labels=None, thresh=0.5,
                     class_names=None):
@@ -29,34 +57,9 @@ def get_object_info(bboxes, scores=None, labels=None, thresh=0.5,
         bounding_boxes.append([int(x) for x in bbox])
     return class_ids, class_scores, bounding_boxes
 
-
-def query_image(query_img_path, db, k=5):
-    net = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
-    x, query_img = data.transforms.presets.rcnn.load_test(query_img_path)
-    box_ids, scores, bboxes = net(x)
-    query_object_info = get_object_info(bboxes[0], scores[0],
-                                        box_ids[0], class_names=net.classes)
-    if len(query_object_info[0]) <= 0:
-        raise ValueError("Invalid image. No object classes could be found.")
-    print(query_object_info[0])
-    scores_and_images = []
-    for image_path, db_obj_info in db.object_predictions.items():
-        curr_score = 0
-        num_category_matches = 0
-        if type(db_obj_info["class_names"]) == dict and len(db_obj_info["class_names"]) > 0:
-            for obj_class, num in db_obj_info["class_names"].items():
-                if obj_class in query_object_info[0]:
-                    num_category_matches += 1
-                    curr_score += num
-        if curr_score > 0:
-            # print(image_path, curr_score, num_category_matches)
-            scores_and_images.append([image_path, curr_score, num_category_matches])
-    return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
-
-
 def save_object_predictions(image_dir, database, num_images=None):
     net = model_zoo.get_model('yolo3_darknet53_voc', pretrained=True)
-    image_paths = AlteredXception.grab_all_image_paths(image_dir, None)
+    image_paths = grab_all_image_paths(image_dir)
     object_infos = []
     loaded_image_paths = []
     num_loaded_predictions = 0
