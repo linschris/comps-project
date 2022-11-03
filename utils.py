@@ -23,13 +23,27 @@ def grab_all_image_paths(image_dir):
 
 # Video Utility Functions
 
-def get_youtube_urls(image_scores):
-    youtube_urls = []
+def get_youtube_urls(image_scores, k):
+    youtube_urls = {}
     for element in image_scores:
         image_path, score = element[0], element[1]
-        yt_url = get_youtube_embed_url(image_path)
-        youtube_urls.append(yt_url)
+        yt_url, time_str = get_yt_embed_url(image_path)
+        if yt_url not in youtube_urls:
+            youtube_urls[yt_url] = [] # May change to set
+            if len(youtube_urls) >= k:
+                break
+        if time_str:
+            youtube_urls[yt_url].append(time_str)
     return youtube_urls
+
+def get_yt_embed_url(image_path: str) -> tuple([str, int]):
+    image_path = image_path.split("/")[-1] # We only want the last part of the path
+    video_id = image_path[0:11]
+    video_embed_url = f'https://www.youtube.com/embed/{video_id}'
+    if len(image_path) > 16: # 11 for YT ID, 5 for .webp (at max), so we're looking at frame
+        curr_time_str = int(image_path[-9:-4])
+        return video_embed_url, curr_time_str
+    return video_embed_url, None
 
 def get_youtube_embed_url(image_path):
     curr_str = (image_path.split("/")[-1]).split("_frame")
@@ -42,18 +56,6 @@ def get_youtube_embed_url(image_path):
         return f'https://www.youtube.com/embed/{id_without_ext}'
     else:
         return f'https://www.youtube.com/embed/{video_id}'
-
-def get_youtube_url(image_path):
-    curr_str = (image_path.split("/")[-1]).split("_frame")
-    video_id = curr_str[0]
-    if len(curr_str) == 2:  # We're looking at a frame
-        time_str = get_youtube_time_str(curr_str[1][1:6])
-        return f'https://www.youtube.com/watch?v={video_id}&t={time_str}'
-    else:  # We're looking at a thumbnail
-        if "." in video_id:
-            id_without_ext = video_id.split('.')[0]
-            return f'https://www.youtube.com/watch?v={id_without_ext}'
-        return f'https://www.youtube.com/watch?v={video_id}'
 
 def get_youtube_time_str(time_str):
     num_seconds = int(time_str)
@@ -77,8 +79,3 @@ def get_youtube_time_str(time_str):
         else:
             curr_str += f'{num_seconds}s'
     return curr_str
-
-def convert_to_embed_links(yt_urls):
-    for i in range(len(yt_urls)):
-        yt_urls[i] = yt_urls[i].replace("https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/")
-        yt_urls[i] = yt_urls[i].replace("&t=", "?start=")
