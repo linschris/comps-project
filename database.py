@@ -44,13 +44,14 @@ class Database:
         numpy.save(self.rmac_predictions_fp, self.rmac_predictions)
         
         image_path_prediction_map = {}
-        max_index = len(self.rmac_predictions)
+        max_index = len(self.rmac_prediction_image_paths)
+
         for i in range(max_index, max_index + len(image_paths)):
             image_path_prediction_map[image_paths[i - max_index]] = i
         self.rmac_prediction_image_paths.update(image_path_prediction_map)
 
         with open(self.rmac_prediction_image_paths_fp, 'w', encoding='utf-8') as f:
-            f.write(json.dumps(self.prediction_image_paths) + "\n")
+            f.write(json.dumps(self.rmac_prediction_image_paths) + "\n")
         
     def store_object_data(self, object_infos, image_paths):
         image_path_object_data_map = {}
