@@ -6,28 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Find Related Videos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+    <script type="text/javascript">
+      var ytJSON = JSON.parse('{{yt_links | tojson | safe}}');
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </head>
   <body>
     <div id="header">
-      <h1>YouTube Image Search</h1>
-      <h3>Find YouTube Videos All Through Images!</h3>
+      <h1 id="title">YouTube Video Search</h1>
+      <h3 class="subheading" style="color: rgb(97, 97, 97);">Find YouTube Videos All Through Images!</h3>
     </div>
-    <form id="image-upload-form" method="post" enctype="multipart/form-data">
+    <form id="image-upload-form" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>
       <input type="submit" />
     </form>
-    {% if file_url %}
+    {% if b64_preview_image %}
         <div id="image-preview">
-            <h3 style="text-align: center;">Predicted on:</h3>
-            <img src="{{ file_url }}" />
+            <h3 class="subheading">Predicted on:</h3>
+            <img src="{{ b64_preview_image }}" />
         </div>
     {% endif %}
     {% if yt_links %}
-      <h4 style="text-align: center;">Found (Most To Least Related):</h4>
+      <div id="found-header">
+        <h4 id="found-header-title" class="subheading">Found (Most To Least Related):</h4>
+      </div>
       <div id="yt-embed-links">
-        {% for link in yt_links %}
-            <iframe src="{{link}}" width="500" height="300" frameborder="0"></iframe>
-        {% endfor %}
+        
       </div>
     {% endif %}
   </body>
