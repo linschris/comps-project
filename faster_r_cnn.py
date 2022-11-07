@@ -4,14 +4,14 @@ from database import Database
 from utils import grab_all_image_paths
 
 class FasterRCNN:
-    def __init__(self, db: Database):
+    def __init__(self, db: Database = None):
         self.database = db
         self.model = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
     
     def __call__(self, query_img_path):
-        return self.query_image_by_objects(query_img_path)
+        return self.query_image(query_img_path)
 
-    def query_image_by_objects(self, query_img_path, k=5):
+    def query_image(self, query_img_path, k=5):
         x, query_img = data.transforms.presets.rcnn.load_test(query_img_path)
         box_ids, scores, bboxes = self.model(x)
         query_object_info = get_object_info(bboxes[0], scores[0],
@@ -30,6 +30,21 @@ class FasterRCNN:
             if curr_score > 0:
                 scores_and_images.append([image_path, curr_score, num_category_matches])
         return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
+    
+    def get_object_predictions(self, image_paths):
+        object_infos = []
+        loaded_image_paths = []
+        for image_path in image_paths:
+            if image_path[-4:-1] == ".jp" and image_path not in self.database.object_predictions:
+                x, orig_img = data.transforms.presets.rcnn.load_test(
+                    image_path)
+                box_ids, scores, bboxes = self.model(x)
+                curr_process = get_object_info(bboxes[0], scores[0],
+                                            box_ids[0], class_names=self.model.classes)
+                object_infos.append(curr_process)
+                loaded_image_paths.append(image_path)
+        return object_infos
+
 
 def get_object_info(bboxes, scores=None, labels=None, thresh=0.5,
                     class_names=None):
