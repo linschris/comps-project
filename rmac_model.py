@@ -24,6 +24,14 @@ class RMACModel:
     def __call__(self, query_img_path) -> any:
         return self.query_image(query_img_path)
 
+    def get_rmac_vectors(self, images):
+        curr_fvs = []
+        for image in images:
+            image = np.reshape(image, (1, 299, 299, 3))
+            curr_fv = self.model.predict([image, np.expand_dims(self.regions, axis=0)])
+            curr_fvs.append(curr_fv)
+        return np.concatenate(curr_fvs, axis=0)
+    
     def query_image(self, query_image_path):
         query_img = get_and_resize_image(query_image_path, self.model.input_shape[0][1:])
         query_fv = self.model.predict([query_img, np.expand_dims(self.regions, axis=0)])
@@ -53,7 +61,7 @@ def create_rmac_model(num_rois):
         Essentially, we've capture many "regions" in a single vector. 
     '''
     
-    altered_xception = AlteredXception(None, output_layer_name='conv2d_4')
+    altered_xception = AlteredXception(output_layer_name='conv2d_4')
     in_roi = Input(shape=(num_rois, 4), name='input_roi')
     
     x = RoiPooling([1], num_rois)([altered_xception.model.output, in_roi])
@@ -125,12 +133,3 @@ def get_rmac_regions(W, H, L):
 
     regions = np.asarray(regions)
     return regions
-
-# if __name__ == "__main__":
-#     ax = AlteredXception(None, output_layer_name='conv2d_3')
-#     W, H, C = ax.model.output_shape[1:]
-#     regions = get_rmac_regions(W, H, 3)
-#     rmac_model = create_rmac_model(len(regions))
-#     img = ax.get_and_resize_image("/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/test-frames/-_2onFzLtY8_frame_00001.jpg")
-#     rmac_output = rmac_model.predict([img, np.expand_dims(regions, axis=0)])
-    
