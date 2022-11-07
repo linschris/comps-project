@@ -4,12 +4,12 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 from database import Database
-from utils import get_and_resize_image, grab_all_image_paths
+from utils import get_and_resize_image
 
 class AlteredXception:
     """An altered model of the Xception Model, mainly for transfer learning."""
 
-    def __init__(self, database: Database = None, output_layer_name: str = "avg_pool", random_state: int = 10) -> None:
+    def __init__(self, output_layer_name: str = "avg_pool", random_state: int = 10, database: Database = None) -> None:
         """Initalizes the pre-trained, altered Xception Model.
 
         Args:
@@ -28,7 +28,7 @@ class AlteredXception:
         self.random_state = random_state
 
     def __call__(self, query_img_path) -> any:
-        return self.query_img_by_global_feature_vector(query_img_path)
+        return self.query_image(query_img_path)
 
     def init_altered_model(self, output_layer_name):
         '''
@@ -52,46 +52,6 @@ class AlteredXception:
         """
         curr_image = get_and_resize_image(image_path, self.model.input_shape[1:])
         return self.get_avg_feature_vectors(curr_image)
-
-    def grab_images_and_paths(self, image_dir: str, num_images: int = None) -> tuple([list, int]):
-        """Grab either a specific number (if num_images is not None) or all the images from a
-        directory you specify. 
-        
-        Note: to ensure we don't get predictions from already-computed images, if the image path already
-        exists in the database, we will skip over it.
-
-        Args:
-            image_dir (str): The directory to grab images from.
-            num_images (int): The number of images you want to grab. If None, we grab all images.
-
-        Raises:
-            ValueError: If the number of images grabbed is equal to 0, then we throw an Error, as it's
-            unlikely you want/expect to grab 0 (for gathering predictions for example).
-
-        Returns:
-            tuple(list, int): A tuple containing a list of image paths, and the number of images grabbed.
-        """
-        loaded_images = []
-        loaded_image_paths = []
-        curr_index, num_loaded_images = 0, 0
-        curr_image_paths = grab_all_image_paths(image_dir)
-        while (not num_images or num_loaded_images < num_images) and curr_index < len(curr_image_paths):
-            curr_image_path = curr_image_paths[curr_index]
-            if curr_image_path not in self.db.prediction_image_paths:
-                try:
-                    curr_image = get_and_resize_image(curr_image_path, self.model.input_shape[1:])
-                    loaded_images.append(curr_image)
-                    loaded_image_paths.append(curr_image_path)
-                    num_loaded_images += 1
-                except Exception:
-                    pass
-                curr_index += 1
-            else:
-                curr_image_paths.pop(curr_index)
-        if num_loaded_images <= 0:
-            raise ValueError(f"No images could be found in {image_dir}, or all images from {image_dir} have been grabbed.")
-        loaded_images = np.concatenate(loaded_images, axis=0)
-        return loaded_image_paths, loaded_images
 
     def get_avg_feature_vectors(self, images: list[np.ndarray], postprocess: bool = False) -> list[np.ndarray]:
         """Grab `global` feature vectors, or vectors describing the list of images provided.
@@ -121,7 +81,7 @@ class AlteredXception:
         return avg_feature_vectors
     
     def pca_feature_vector(self, feature_vectors: np.ndarray):
-        """Compute Principal Component Analysis on the list of feature vectors
+        """Performs Principal Component Analysis on the list of feature vectors
         describing the images, tries to explain 99% variance for less information loss.
 
         Args:
@@ -138,7 +98,7 @@ class AlteredXception:
         condensed_feature_vectors = pca.transform(feature_vectors)
         return condensed_feature_vectors
     
-    def query_img_by_global_feature_vector(self, query_img_path: str) -> list:
+    def query_image(self, query_img_path: str) -> list:
         """Queries a given image by the `global` feature vectors to determine
         which images are closest, distance-wise as a similarity metric.
 
