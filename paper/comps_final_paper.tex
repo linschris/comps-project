@@ -27,11 +27,11 @@
   {}
 
 \pdfinfo{
-    /Title (Image Search In Video Platforms With The Fuzzy C-Means Algorithm)
+    /Title (Image Search On YouTube Videos With Convolutional Neural Networks)
     /Author (Christopher Linscott)
 }
 
-\title{Image Search In Video Platforms With The Fuzzy C-Means Algorithm}
+\title{Image Search In Video Platforms With Convolutional Neural Networks}
 
 \author{Christopher Linscott}
 \affiliation{Occidental College}
@@ -47,11 +47,19 @@
 
 Often, when learning new topics or exploring new areas, one may come across a topic or object they’ve never seen before. Getting more information feels paradoxical, as obtaining further knowledge given only visual context is difficult; in a sense, you “don’t know what you don’t know”. In general, current video recommendation methods rely on textual information about the video using keywords \cite{Stanford2021}. Without knowing the name or a related keyword, one cannot simply search the web in hopes for an answer. Not only does image search help users tell the search engine what they’re looking for (without ambiguity), but image-related search removes the need to annotate images online with keywords as image similarity can be used as a heuristic \cite{Adrakatti2016}.
 
-The solution I propose involves utilizing video platforms like YouTube, as a means to solve this information gap using related videos, while also offering times within videos where the relevant content is found. A user would insert an image of an object in real life or even a drawing (from their lecture notes for example), and my project would return videos with related images either in the thumbnail or the video frames. If related video frames are found within the video, times corresponding to these frames will additionally be returned.
+The solution I've created involves utilizing video platforms like YouTube, as a means to solve this information gap using related videos, while also offering times within videos where the relevant content is found. A user would insert an image of an object in real life or even a drawing (from their lecture notes for example), and my project would return videos with related images either in the thumbnail or the video frames. If related video frames are found within the video, times corresponding to these frames will additionally be returned.
 
-YouTube videos can be broken down into images through both the thumbnail, an image preview of the video content, and the individual frames which make up the same video. With my project, we essentially create "baskets" of videos which relate to each other by visual characteristics (called “features”). Upon inserting an image, finding relevant information means finding the basket of images (that refer to videos or video frames) which relate to our input image by comparing features. By utilizing video frames as opposed to simply other images (like thumbnails), my project speeds up the searching process by returning a time within the video. From an educational perspective, not only does this help students fulfill these information gaps through videos, but it can speed up the studying process as users don’t always have to sift through a video to grab the relevant information.
+YouTube videos can be broken down into images through both the thumbnail, an image preview of the video content, and the individual frames which make up the same video. With my project, we essentially create mathematical "descriptions" of images, containing numerical information of visual characteristics (called features), which can be compared to each other using distance-based or voting-based methods. 
+Upon the insertion of an image, a description of the video will be computed and will be compared against stored descriptions of other images (whether frames or thumbnails).
+
+Upon inserting an image, finding relevant information means finding images (that refer back to a given video) which relate to our input image by comparing these features. By utilizing video frames in addition to the thumbnails, my project speeds up the searching process by returning a time within the video. From an educational perspective, not only does this help students fulfill these information gaps through videos, but it can speed up the studying process as users don’t always have to sift through a video to grab the relevant information.
 
 \section{Technical Background} 
+
+Determining a description of an image means taking into account the positions of objects, edges, shapes, and other characteristic of objects that may render useful. Creating these mathematical "descriptions" of images required using a Convolutional Neural Network (CNN), a specialized Artifical Neural Network designed for pattern recognition. 
+
+In order to determine information about an image and get a corresponding datapoint, in processing images and assigning them a belongingness metric, By doing so, we can retrieve an "activation" or how much of a particular feature is in a given image. Thereby, we can determine the activation of surroundings, noise, objects, and people in a given image. By assessing these visual characteristics, we can derive a datapoint for a particular image, and utilize the function and algorithms previously discussed. By utilizing these activations, we can flatten them into one long vector and insert them as one single datapoint of dimension d. By clustering, using the Fuzzy C Means algorithm, and gathering datapoints, using a CNN, we'll have representatives baskets of images that relate to each other based on features derived from the CNN. 
+
 
 Creating baskets of related images and video frames requires using clustering (an unsupervised version of classification). To be more specific, clustering is the “method of segmenting a population into subgroups where members are more similar to each other than to members of other subgroups based on certain observed features” \cite{C3Clustering}. Clustering will involve creating subgroups of videos which relate to each other based on characteristics of one another. It’s referenced as unsupervised as the images and video frames we give will not have any pre-existing labels on them; finding datasets large enough, which includes these labels or categories, is a hard task in itself. Our population here will be a collection of images corresponding to objects in the real world, drawings, YouTube thumbnails, and YouTube video frames. Features, in this context, are visual characteristics of these images that may relate to other images.
 
@@ -74,7 +82,7 @@ The second equation calculates the new membership values of the datapoints, by c
 
 % However, the main input for a clustering algorithm is datapoints, which have some dimension d. Inserting a 2D image simply means inserting \( h * w * 3 \) pixels where \(h\) is height, \(w\) is width, and 3 represents the three channels of color (red, green, blue) for a given image. While this will be iterated in Methods, pixels are not a good approach to clustering images as they do not derive meaningful clusters.
 
-In order to determine information about an image and get a corresponding datapoint, in processing images and assigning them a belongingness metric, we need to take into account the objects, edges, shapes, and other characteristic of objects that may render useful. To do so, we can utilize a convolutional neural network (CNN). By doing so, we can retrieve an "activation" or how much of a particular feature is in a given image. Thereby, we can determine the activation of surroundings, noise, objects, and people in a given image. By assessing these visual characteristics, we can derive a datapoint for a particular image, and utilize the function and algorithms previously discussed. By utilizing these activations, we can flatten them into one long vector and insert them as one single datapoint of dimension d. By clustering, using the Fuzzy C Means algorithm, and gathering datapoints, using a CNN, we'll have representatives baskets of images that relate to each other based on features derived from the CNN. 
+
 
 % By repurposing this equation to account for an input image (or image in the dataset) to include objects and people, we can effectively begin to determine the data points for a given image. Utilizing this equation referenced above, we can utilize the Fuzzy C-Means algorithm as a means to cluster and determine how strongly a given image belongs to a given number of clusters.
 

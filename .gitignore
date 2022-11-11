@@ -4,7 +4,6 @@ data/test-frames
 data/thumbnails
 data/videos
 tfrecords
-interface/static/images
 labeled_data/
 __pycache__/
 .DS_Store
@@ -15,3 +14,17 @@ openimages/
 .vscode/
 needs_profiling.prof
 eval
+predictions
+# Latex Paper compilation files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.log
+*.pdf
+*.run.xml
+*.synctex.gz
+
