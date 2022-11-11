@@ -3,6 +3,8 @@ from __future__ import print_function
 from keras.layers import Lambda, Dense, TimeDistributed, Input
 from keras.models import Model
 import keras.backend as K
+import sys
+sys.path.append('./models')
 from database import Database
 from roi_pooling import RoiPooling
 from altered_xception import AlteredXception
@@ -64,7 +66,7 @@ def create_rmac_model(num_rois):
     altered_xception = AlteredXception(output_layer_name='conv2d_4')
     in_roi = Input(shape=(num_rois, 4), name='input_roi')
     
-    x = RoiPooling([1], num_rois)([altered_xception.model.output, in_roi])
+    x = RoiPooling([1, 2, 3, 4], num_rois)([altered_xception.model.output, in_roi])
     # L2 Normalization
     x = Lambda(lambda x: K.l2_normalize(x, axis=2), name='norm1')(x)
     # PCA

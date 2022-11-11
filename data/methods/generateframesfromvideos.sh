@@ -22,7 +22,7 @@ do
 	then
 		echo "${filename} not found."
 		# fps=$(ffmpeg -i "${video}" 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
-		fps=1
+		fps=1 # Grab a frame every second
 		$FFMPEG -i "${video}" -r ${fps} $2/"${videoname}"_frame_%05d.$3
 	fi
 done

@@ -115,6 +115,5 @@ def download_yt_thumbnail(yt_id: str, download_dir: str) -> list:
             v = subprocess.Popen(
                 f"yt-dlp {yt_url} -f '160[ext=mp4]' -o {download_video_path}.mp4", shell=True)
         except Exception as error:
-            print(
-                f"Error with downloading thumbnail/video from URL: {yt_url} with error: {error}")
+            print(f"Error with downloading thumbnail/video from URL: {yt_url} with error: {error}")
     return [download_thumbnail_path, download_video_path]

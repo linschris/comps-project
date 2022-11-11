@@ -4,6 +4,7 @@ from database import Database
 from utils import grab_all_image_paths
 
 class FasterRCNN:
+    ''' Object Detection Model '''
     def __init__(self, db: Database = None):
         self.database = db
         self.model = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
@@ -34,7 +35,9 @@ class FasterRCNN:
     def get_object_predictions(self, image_paths):
         object_infos = []
         loaded_image_paths = []
+        curr_num = 0
         for image_path in image_paths:
+            print(curr_num)
             if image_path[-4:-1] == ".jp" and image_path not in self.database.object_predictions:
                 x, orig_img = data.transforms.presets.rcnn.load_test(
                     image_path)
@@ -43,6 +46,7 @@ class FasterRCNN:
                                             box_ids[0], class_names=self.model.classes)
                 object_infos.append(curr_process)
                 loaded_image_paths.append(image_path)
+            curr_num += 1
         return object_infos
 
 

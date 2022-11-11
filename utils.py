@@ -1,10 +1,11 @@
 import glob
 import cv2
 import numpy as np
+import os
 
 # Constants
-DATABASE_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/predictions"
-EVAL_DB_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/eval/predictions"
+DATABASE_PATH = os.path.join(os.getcwd(), "data", "predictions")
+EVAL_DB_PATH = os.path.join(os.getcwd(), "eval", "predictions")
 DOG_DB_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/eval/dog-predictions"
 CAT_DB_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/eval/cat-predictions"
 

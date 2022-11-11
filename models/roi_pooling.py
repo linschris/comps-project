@@ -1,7 +1,5 @@
 from tensorflow.python.keras.layers import Layer
 import keras.backend as K
-import keras
-
 
 class RoiPooling(Layer):
     """ROI pooling layer for 2D inputs.

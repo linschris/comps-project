@@ -7,7 +7,7 @@ from database import Database
 from utils import get_and_resize_image
 
 class AlteredXception:
-    """An altered model of the Xception Model, mainly for transfer learning."""
+    """An altered model of the pre-trained Xception Model, which has the fully-connected (or more) layers chopped off to extract the feature maps or other outputs."""
 
     def __init__(self, output_layer_name: str = "avg_pool", random_state: int = 10, database: Database = None) -> None:
         """Initalizes the pre-trained, altered Xception Model.

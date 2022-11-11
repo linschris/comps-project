@@ -4,6 +4,10 @@ import numpy
 import ujson
 
 class Database:
+    """
+        A fake database based on JSON and NPY files to store the predictions the models make, which then
+        can be queried against.
+    """
     def __init__(self, database_file_path: str) -> None:
         # Filepaths to load data from
         self.object_predictions_fp = os.path.join(database_file_path, 'objects.json')
