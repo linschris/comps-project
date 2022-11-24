@@ -1,11 +1,11 @@
 from utils import get_youtube_urls
 
-def query_image(query_img_path: str, callable_functions: list, k=5) -> dict:
+def query_image(query_img_path: str, models: list, k=5) -> dict:
     """Queries image using different models and functions.
 
     Args:
         query_img_path (str): Image to be query
-        callable_functions (list): A list of callable models (__call__) or functions that can query the image
+        models (list): A list of models that can query the image by `query_image`
         k (int, optional): The number of top YouTube videos/URLs to compute. Defaults to 5.
 
     Returns:
@@ -14,11 +14,13 @@ def query_image(query_img_path: str, callable_functions: list, k=5) -> dict:
         Note: frames from the same video will be grouped together.
     """
     model_outputs = {}
-    for function in callable_functions:
-        if callable(function):
-            image_scores = function(query_img_path)
+    for model in models:
+        model_name = type(function).__name__
+        query_image_method = getattr(model, "query_image")
+        if callable(query_image_method): # If query_image method exists and is callable in model
+            image_scores = model.query_image(query_img_path)
             yt_urls = get_youtube_urls(image_scores, k)
-            model_outputs[type(function).__name__] = yt_urls
+            model_outputs[model_name] = yt_urls
         else:
-            print(f"{type(function).__name__} is not callable.")
+            print(f"{model_name} could not query the image.")
     return model_outputs

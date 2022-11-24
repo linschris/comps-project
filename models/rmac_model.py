@@ -12,21 +12,22 @@ import numpy as np
 from utils import get_and_resize_image
 
 class RMACModel:
-    def __init__(self, conv_fm_shape: tuple, region_param: int, db: Database = None) -> None:
+    def __init__(self, conv_fm_shape: tuple, region_param: int, database: Database = None) -> None:
         '''
-            Initializes a RMAC Model based on the Convolutional Feature Map 
+            Initializes a RMAC Model based on the output convolutional Feature Map 
             "Shape" which is a tuple containing the height and width of the feature maps, 
             and number of feature maps. 
         '''
         width, height, *num_fm = conv_fm_shape
         self.regions = get_rmac_regions(width, height, region_param)
         self.model = create_rmac_model(len(self.regions)) # Recall it'll have 2 parts
-        self.database = db
+        self.database = database
+    
+    def predict_image_from_path(self, image_path):
+        image = get_and_resize_image(image_path, self.model.input_shape[0][1:])
+        return self.predict_images(image)
 
-    def __call__(self, query_img_path) -> any:
-        return self.query_image(query_img_path)
-
-    def get_rmac_vectors(self, images):
+    def predict_images(self, images):
         curr_fvs = []
         for image in images:
             image = np.reshape(image, (1, 299, 299, 3))
@@ -44,6 +45,8 @@ class RMACModel:
             dist = np.linalg.norm(query_fv - curr_fv)
             distances.append([image_path, dist])   
         return sorted(distances, key=lambda x: x[1])
+
+'''RMAC Model Creation Methods'''
 
 def addition(x):
     total = K.sum(x, axis=1)
