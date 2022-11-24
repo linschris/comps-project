@@ -9,8 +9,8 @@ def get_tf_records(eval_type: str, data_type: str, tf_record_dir: str) -> None:
     e.g. `./tfrecords/video/test/*.tfrecord` for `./tfrecords` tf_record_dir, `video` data_type, `test` eval_type
 
     Args:
-        eval_type (str): _description_
-        data_type (str): _description_
+        eval_type (str): The type of data, whether you want the training ("train"), testing ("test"), and/or validation ("validation") data.
+        data_type (str): Either the video features (video), frame features (frame), or segment features (segment).
     """
     r = requests.get(
         f"http://storage.googleapis.com/us.data.yt8m.org/2/{data_type}/{eval_type}/index.html")

@@ -37,10 +37,12 @@ class Database:
             image_path_prediction_map[image_paths[i - max_index]] = i
         self.prediction_image_paths.update(image_path_prediction_map)
 
-        with open(self.prediction_image_paths_fp, 'w', encoding='utf-8') as f:
-            f.write(json.dumps(self.prediction_image_paths) + "\n")
+        self.store_json_data(self.prediction_image_paths, self.prediction_image_paths_fp)
     
     def store_rmac_predictions(self, predictions, image_paths) -> None:
+        # This is essentially repeated code, but I decided this over a flag to determine
+        # where the predictions we provide should be stored.
+        
         if numpy.size(self.rmac_predictions, axis=0) > 0:
             self.rmac_predictions = numpy.append(self.rmac_predictions, predictions, axis=0)
         else:
@@ -53,9 +55,8 @@ class Database:
         for i in range(max_index, max_index + len(image_paths)):
             image_path_prediction_map[image_paths[i - max_index]] = i
         self.rmac_prediction_image_paths.update(image_path_prediction_map)
-
-        with open(self.rmac_prediction_image_paths_fp, 'w', encoding='utf-8') as f:
-            f.write(json.dumps(self.rmac_prediction_image_paths) + "\n")
+        
+        self.store_json_data(self.rmac_prediction_image_paths, self.rmac_prediction_image_paths_fp)
         
     def store_object_data(self, object_infos, image_paths):
         image_path_object_data_map = {}
@@ -66,15 +67,18 @@ class Database:
                 "bounding_box_coords": object_info[2],
             }
         self.object_predictions.update(image_path_object_data_map)
-        with open(self.object_predictions_fp, 'w', encoding='utf-8') as f:
-            f.write(json.dumps(self.object_predictions) + "\n")
-        
+        self.store_json_data(self.object_predictions_fp, self.object_predictions)
+    
+    def store_json_data(self, json_data, json_file_path):
+        with open(json_file_path, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(json_data) + "\n")
+    
     def load_json_data(self, json_file_path):
         if not os.path.exists(json_file_path):
             return {}
         with open(json_file_path, encoding='utf-8') as json_file:
             try:
-                return ujson.load(json_file)
+                return ujson.load(json_file) # uJSON is faster for loading large JSON files
             except Exception:
                 return {}
     

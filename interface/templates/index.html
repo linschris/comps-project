@@ -10,29 +10,28 @@
       var ytJSON = JSON.parse('{{yt_links | tojson | safe}}');
     </script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
   </head>
   <body>
-    <div id="header">
+    <div id="header" class="center-text">
       <h1 id="title">YouTube Video Search</h1>
-      <h3 class="subheading" style="color: rgb(97, 97, 97);">Find YouTube Videos All Through Images!</h3>
+      <h3 class="subtitle" style="color: rgb(97, 97, 97);">Find YouTube Videos All Through Images!</h3>
     </div>
-    <form id="image-upload-form" method="post" action="/" enctype="multipart/form-data">
+    <form id="image-upload-form" class="flex-center-items" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>
       <input type="submit" />
     </form>
     {% if b64_preview_image %}
-        <div id="image-preview">
-            <h3 class="subheading">Predicted on:</h3>
+        <div id="image-preview" class="flex-center-items">
+            <h3 class="subtitle">Predicted on:</h3>
             <img src="{{ b64_preview_image }}" />
         </div>
     {% endif %}
     {% if yt_links %}
-      <div id="found-header">
-        <h4 id="found-header-title" class="subheading">Found (Most To Least Related):</h4>
+      <div id="found-header" class="flex-center-items">
+        <h3 id="found-header-title" class="subtitle">Found (Most To Least Related):</h4>
       </div>
-      <div id="yt-embed-links">
-        
-      </div>
+      <div id="yt-embed-links" class="flex-center-items"></div>
     {% endif %}
   </body>
 </html>

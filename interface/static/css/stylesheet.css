@@ -6,57 +6,42 @@ body {
     font-size: 16px;
 }
 
-#header {
+.subtitle {
+    font-size: 1.5rem;
+}
+
+.center-text {
     text-align: center;
+}
+
+.flex-center-items {
+    /* Use flexbox to place items in the center of the div */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#header {
+    padding: 1rem;
 }
 
 #title {
     font-size: 3rem;
 }
 
-#subtitle {
-    font-size: 1.5rem;
-    
-}
-.subheading {
-    font-size: 1.5rem;
-    text-align: center;
-}
-
-#image-upload-form {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 #image-preview {
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     margin-top: 1rem;
 }
 
 #image-preview > img {
-    /* Maintain aspect ratio while keeping a maximum size */
-    max-width: 500px;
-    max-height: 500px;
     width: auto;
     height: auto;
 }
 
-#yt-embed-links {
-    display: flex;
+#yt-embed-links, #ground-truth {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    row-gap: 0.5rem;
-}
-
-.video-iframe {
-    width: 500px;
-    height: 300px;
-    border: 0;
+    row-gap: 5rem;
 }
 
 button {
@@ -66,38 +51,41 @@ button {
 }
 
 #found-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    column-gap: 0.5rem;
+    column-gap: 1rem;
+    padding: 1rem;
 }
 
-#model-dropdown {
-    border: 0;
-    border-bottom: 1.5px solid black;
+#found-header > select {
+    border: 1.5px rgb(149, 148, 148);
+    cursor: pointer;
+    border-radius: 0.5rem;
+    border-right: 0.5rem solid transparent; /* Add padding for dropdown arrow */
+    padding: 0.25rem;
     padding-right: 0.5rem;
-    padding-bottom: 0.25rem;
     font-size: 1.5rem;
-    background: transparent;
-    border-bottom-left-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-}
-
-#model-dropdown {
-    left: 0;
-    right: auto;
+    color: rgb(97, 96, 96);
 }
 
 .video-container {
-    /* display: flex; */
-    align-items: center;
-    column-gap: 1rem;
+    position: relative;
+    width: 85%;
+    /* padding-bottom: 56.25%; Trick to maintian 16:9 ratio */
+    flex-direction: column;
 }
+
+/* .video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+} */
 
 .video-rel-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
     row-gap: 0.5rem;
     padding: 1rem;
 }
@@ -105,5 +93,3 @@ button {
 .video-rel-info + .subheading {
     font-weight: 600;
 }
-
-

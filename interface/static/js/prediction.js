@@ -54,7 +54,6 @@ class Prediction {
         videoDiv.classList.add('video-container')
         videoDiv.classList.add('flex-center-items')
 
-
         let currIFrame = document.createElement('iframe')
         currIFrame.classList.add('video-iframe')
         currIFrame.src = currVideoLink

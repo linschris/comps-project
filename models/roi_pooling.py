@@ -54,7 +54,7 @@ class RoiPooling(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
     def call(self, x, mask=None):
-        assert (len(x) == 2)
+        # assert (len(x) == 2)
         img = x[0]
         rois = x[1]
 

@@ -13,7 +13,7 @@ class AlteredXception:
         """Initalizes the pre-trained, altered Xception Model.
 
         Args:
-            database (Database): A database instance to store predictions to.
+            database (Database): A database instance to query from.
             output_layer_name(str): If you want a specific layer to be the output layer, you can specify its name
             and this layer will become the new output_layer.
             random_state(int): By specifying a seed for predictions, ensure we get consistent (or different) results.
@@ -22,14 +22,11 @@ class AlteredXception:
                 for layer in keras_model.layers:
                     print(layer.name)
         """
-        self.db = database
+        self.database = database
         self.output_layer_name = output_layer_name
         self.model = self.init_altered_model(output_layer_name)
         self.random_state = random_state
-
-    def __call__(self, query_img_path) -> any:
-        return self.query_image(query_img_path)
-
+    
     def init_altered_model(self, output_layer_name):
         '''
             Utilizes 'transfer learning' in which we utilize an altered (last layer removed) Xception CNN model trained on ImageNet images as opposed to creating and training our own model.
@@ -41,7 +38,7 @@ class AlteredXception:
         new_model = Model(xception_model.input, last_output)
         return new_model
 
-    def get_image_feature_vector(self, image_path) -> np.ndarray:
+    def predict_image_from_path(self, image_path) -> np.ndarray:
         """Computes and returns a global feature vector from the image.
 
         Args:
@@ -51,9 +48,9 @@ class AlteredXception:
             NDArray: A (1, 2048) Numpy Array, acting as a descriptor for the image.
         """
         curr_image = get_and_resize_image(image_path, self.model.input_shape[1:])
-        return self.get_avg_feature_vectors(curr_image)
+        return self.predict_images(curr_image)
 
-    def get_avg_feature_vectors(self, images: list[np.ndarray], postprocess: bool = False) -> list[np.ndarray]:
+    def predict_images(self, images: list[np.ndarray], postprocess: bool = False) -> list[np.ndarray]:
         """Grab `global` feature vectors, or vectors describing the list of images provided.
 
         Args:
@@ -112,13 +109,13 @@ class AlteredXception:
         Returns:
             list: A list of image paths, sorted by distance, closest to farthest.
         """
-        if not isinstance(self.db, Database):
+        if not isinstance(self.database, Database):
             raise ValueError("Invalid Instance Of Xception. Please initalize this model with a database.")
-        query_fv = self.get_image_feature_vector(query_img_path)
+        query_fv = self.predict_image_from_path(query_img_path)
         distances = []
-        for image_path in self.db.prediction_image_paths.keys():
-            curr_index = self.db.prediction_image_paths[image_path]
-            curr_fv = self.db.predictions[curr_index]
+        for image_path in self.database.prediction_image_paths.keys():
+            curr_index = self.database.prediction_image_paths[image_path]
+            curr_fv = self.database.predictions[curr_index]
             dist = np.linalg.norm(query_fv - curr_fv)
             distances.append([image_path, dist])   
         return sorted(distances, key=lambda x: x[1])
