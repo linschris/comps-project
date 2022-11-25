@@ -15,7 +15,7 @@ def query_image(query_img_path: str, models: list, k=5) -> dict:
     """
     model_outputs = {}
     for model in models:
-        model_name = type(function).__name__
+        model_name = type(model).__name__
         query_image_method = getattr(model, "query_image")
         if callable(query_image_method): # If query_image method exists and is callable in model
             image_scores = model.query_image(query_img_path)

@@ -60,13 +60,11 @@ class Database:
         
     def store_object_data(self, object_infos, image_paths):
         # Store inverted index, i.e. we store a map linking object classes to image paths with these images
-        print(object_infos)
         for index, current_object_info in enumerate(object_infos):
             for object_class_name in current_object_info.keys():
                 if object_class_name not in self.object_predictions:
                     self.object_predictions[object_class_name] = {}
                 self.object_predictions[object_class_name][image_paths[index]] = current_object_info[object_class_name]
-        
         self.store_json_data(self.object_predictions, self.object_predictions_fp)
     
     def store_json_data(self, json_data, json_file_path):

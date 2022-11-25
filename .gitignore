@@ -1,20 +1,20 @@
-# data contains .tfrecord files
-data/frames
-data/test-frames
-data/thumbnails
-data/videos
+# stored predictions, frames, thumbnails, and data from YT8M API
+frames
+thumbnails
+videos
 tfrecords
 labeled_data/
+category-ids
+
+# Compiler / Setting Stuff
 __pycache__/
 .DS_Store
-vocab.csv
-# old contains code that may/may not be used
-old/
-openimages/
 .vscode/
 needs_profiling.prof
-eval
-predictions
+
+# Old Model
+sift.py
+
 # Latex Paper compilation files
 *.aux
 *.bbl
