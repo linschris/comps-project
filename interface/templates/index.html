@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Find Related Videos</title>
+    <title>YouTube Image Search</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
     <script type="text/javascript">
       var ytJSON = JSON.parse('{{yt_links | tojson | safe}}');
@@ -14,8 +14,8 @@
   </head>
   <body>
     <div id="header" class="center-text">
-      <h1 id="title">YouTube Video Search</h1>
-      <h3 class="subtitle" style="color: rgb(97, 97, 97);">Find YouTube Videos All Through Images!</h3>
+      <h1 id="title">YouTube Image Search</h1>
+      <h3 class="subtitle" style="color: rgb(97, 97, 97); font-weight: normal;">Find YouTube Videos All Through Images!</h3>
     </div>
     <form id="image-upload-form" class="flex-center-items" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>

@@ -34,7 +34,7 @@ def initialize_ui():
         imagefile = request.files['imagefile'].read()
         im_request_file = request.files.get('imagefile', '')
         ext = '.' + im_request_file.filename.split('.')[1]
-        with tempfile.NamedTemporaryFile(suffix=ext, mode='w+b', dir="./static/images", delete=True) as temp_img_file:
+        with tempfile.NamedTemporaryFile(suffix=ext, mode='w+b', dir="interface/static/images", delete=True) as temp_img_file:
             temp_img_file.write(imagefile)
             image_file_url = os.path.relpath(temp_img_file.name)
             # Read, save, and encode image in base64 to be returned to the user
