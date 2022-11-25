@@ -27,7 +27,7 @@ def get_and_resize_image(image_path: str, resize_shape: tuple) -> np.ndarray:
     )
     return reshaped_img
 
-def grab_all_image_paths(image_dir: str) -> list[str]:
+def grab_all_image_paths(image_dir: str, extensions: list[str] = ['/*.*']) -> list[str]:
     """Grab all the image paths of images with extensions (jpg, webp, and png) from a given directory.
 
     Args:
@@ -37,12 +37,11 @@ def grab_all_image_paths(image_dir: str) -> list[str]:
         list[str]: List of image paths as strings.
     """
     image_paths = []
-    extensions = ('/*.jpg', '/*.webp', '/*.png')
     for extension in extensions:
         image_paths.extend(glob.glob(image_dir + extension))
     return image_paths
 
-def grab_images_and_paths(image_dir: str, image_paths: list = [], num_images: int = None) -> tuple([list[str], list[np.ndarray]]):
+def grab_images_and_paths(image_dir: str, image_paths: list[str] = [], num_images: int = 0) -> tuple[list[str], list[np.ndarray]]:
     """Grab either a specific number (if num_images is not None) or all the images from a
     directory you specify. 
     
@@ -63,19 +62,22 @@ def grab_images_and_paths(image_dir: str, image_paths: list = [], num_images: in
     """
     loaded_images = []
     loaded_image_paths = []
-    curr_image_paths = grab_all_image_paths(image_dir)
+    # curr_image_paths = grab_all_image_paths(image_dir)
     curr_index, num_loaded_images = 0, 0
-    while (not num_images or num_loaded_images < num_images) and curr_index < len(curr_image_paths):
-        curr_image_path = curr_image_paths[curr_index]
-        if curr_image_path not in image_paths:
-            try:
-                curr_image = get_and_resize_image(curr_image_path, (299, 299, 3))
-                loaded_images.append(curr_image)
-                loaded_image_paths.append(curr_image_path)
-                num_loaded_images += 1
-            except Exception as e:
-                # If we run into an error, just don't store and grab other images
-                pass
+    for path, dirs, files in os.walk(image_dir, topdown=True):
+        for image_file_path in files:
+            curr_image_path = os.path.join(f'{path}/{image_file_path}')
+            if curr_image_path not in image_paths:
+                try:
+                    curr_image = get_and_resize_image(curr_image_path, (299, 299, 3))
+                    loaded_images.append(curr_image)
+                    loaded_image_paths.append(curr_image_path)
+                    num_loaded_images += 1
+                except Exception as e:
+                    # If we run into an error, just don't store and grab this image
+                    pass
+            if num_images and num_loaded_images > num_images:
+                break
         curr_index += 1
     if num_loaded_images == 0:
         raise ValueError(f"No images could be found in {image_dir}, or all images from {image_dir} have been grabbed.")
@@ -106,3 +108,19 @@ def get_yt_embed_url(image_path: str) -> tuple([str, int]):
         curr_time_str = int(image_path[-9:-4])
         return video_embed_url, curr_time_str
     return video_embed_url, None
+
+def resize_images(image_dir, new_image_dir):
+    from PIL import Image
+    import os, sys
+
+    path = image_dir
+    dirs = os.listdir( path )
+    for item in dirs:
+        img_path = f'{path}/{item}'
+
+        if os.path.isfile(img_path):
+            im = Image.open(img_path)
+            f, e = os.path.splitext(img_path)
+            imResize = im.resize((299,299), Image.ANTIALIAS)
+            f = f'{f.split("/")[-1].split(".")[0]}'
+            imResize.save(f'{new_image_dir}/{f+e}', 'JPEG', quality=90)
