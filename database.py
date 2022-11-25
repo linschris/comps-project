@@ -59,15 +59,15 @@ class Database:
         self.store_json_data(self.rmac_prediction_image_paths, self.rmac_prediction_image_paths_fp)
         
     def store_object_data(self, object_infos, image_paths):
-        image_path_object_data_map = {}
-        for index, object_info in enumerate(object_infos):
-            image_path_object_data_map[image_paths[index]] = {
-                "class_names": object_info[0],
-                "class_scores": object_info[1],
-                "bounding_box_coords": object_info[2],
-            }
-        self.object_predictions.update(image_path_object_data_map)
-        self.store_json_data(self.object_predictions_fp, self.object_predictions)
+        # Store inverted index, i.e. we store a map linking object classes to image paths with these images
+        print(object_infos)
+        for index, current_object_info in enumerate(object_infos):
+            for object_class_name in current_object_info.keys():
+                if object_class_name not in self.object_predictions:
+                    self.object_predictions[object_class_name] = {}
+                self.object_predictions[object_class_name][image_paths[index]] = current_object_info[object_class_name]
+        
+        self.store_json_data(self.object_predictions, self.object_predictions_fp)
     
     def store_json_data(self, json_data, json_file_path):
         with open(json_file_path, 'w', encoding='utf-8') as f:

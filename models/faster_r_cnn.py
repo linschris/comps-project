@@ -14,41 +14,38 @@ class FasterRCNN():
     
     def predict_image_paths(self, image_paths): # We cannot simply pass in CV2-imread images :/
         object_infos = []
-        loaded_image_paths = []
         curr_num = 0
-        x, orig_img = data.transforms.presets.rcnn.load_test(image_paths)
-        box_ids, scores, bboxes = self.model(x)
-        return []
-        # for image_path in image_paths:
-        #     if image_path[-4:-1] == ".jp" and image_path not in self.database.object_predictions:
-        #         x, orig_img = data.transforms.presets.rcnn.load_test(image_path)
-        #         box_ids, scores, bboxes = self.model(x)
-        #         curr_process = FasterRCNN.parse_object_info(bboxes[0], scores[0],
-        #                                     box_ids[0], class_names=self.model.classes)
-        #         object_infos.append(curr_process)
-        #         loaded_image_paths.append(image_path)
-        #     curr_num += 1
-        #     print(curr_num)
-        # return object_infos
+        for image_path in image_paths:
+            if image_path[-4:-1] == ".jp" and image_path not in self.database.object_predictions:
+                x, orig_img = data.transforms.presets.rcnn.load_test(image_path)
+                box_ids, scores, bboxes = self.model(x)
+                curr_process = FasterRCNN.parse_object_info(bboxes[0], scores[0],
+                                            box_ids[0], class_names=self.model.classes)
+                object_infos.append(curr_process)
+            curr_num += 1
+            print(curr_num)
+        return object_infos
     
     def query_image(self, query_img_path, k=5):
         x, query_img = data.transforms.presets.rcnn.load_test(query_img_path)
         box_ids, scores, bboxes = self.model(x)
         query_object_info = FasterRCNN.parse_object_info(bboxes[0], scores[0],
         box_ids[0], class_names=self.model.classes)
-        if len(query_object_info[0]) <= 0:
+        if len(query_object_info) <= 0:
+            return []
             raise ValueError("Invalid image. No object classes could be found.")
-        scores_and_images = []
-        for image_path, db_obj_info in self.database.object_predictions.items():
-            curr_score = 0
-            num_category_matches = 0
-            if isinstance(db_obj_info["class_names"], dict) and len(db_obj_info["class_names"]) > 0:
-                for obj_class, num in db_obj_info["class_names"].items():
-                    if obj_class in query_object_info[0]:
-                        num_category_matches += 1
-                        curr_score += num
-            if curr_score > 0:
-                scores_and_images.append([image_path, curr_score, num_category_matches])
+        
+        scores_and_images = {}
+        class_names = query_object_info.keys()
+        for class_name in class_names:
+            if class_name in self.database.object_predictions:
+                for image_path in self.database.object_predictions[class_name]:
+                    num_img_objects = len(self.database.object_predictions[class_name][image_path])
+                    num_query_objects = len(query_object_info[class_name])
+                    object_diff_score = 1 if num_img_objects == num_query_objects else 1/(abs(num_img_objects - num_query_objects))
+                    if image_path not in scores_and_images:
+                       scores_and_images[image_path] = 0
+                    scores_and_images[image_path] += object_diff_score * sum(self.database.object_predictions[class_name][image_path])
         return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
     
     @staticmethod
@@ -62,18 +59,14 @@ class FasterRCNN():
             scores = scores.asnumpy()
 
         class_ids = {}
-        class_scores = []
-        bounding_boxes = []
         for i, bbox in enumerate(bboxes):
             if scores is not None and scores.flat[i] < thresh:
                 continue
             if labels is not None and labels.flat[i] < 0:
                 continue
             cls_id = int(labels.flat[i]) if labels is not None else -1
-            if class_names[cls_id] not in class_ids:
-                class_ids[class_names[cls_id]] = 0
-            class_ids[class_names[cls_id]] += 1
             score = float('{:.3f}'.format(scores.flat[i]))
-            class_scores.append(score)
-            bounding_boxes.append([int(x) for x in bbox])
-        return class_ids, class_scores, bounding_boxes
+            if class_names[cls_id] not in class_ids:
+                class_ids[class_names[cls_id]] = []
+            class_ids[class_names[cls_id]].append(score)
+        return class_ids
