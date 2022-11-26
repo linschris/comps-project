@@ -31,10 +31,8 @@ class FasterRCNN():
         box_ids, scores, bboxes = self.model(x)
         query_object_info = FasterRCNN.parse_object_info(bboxes[0], scores[0],
         box_ids[0], class_names=self.model.classes)
-        if len(query_object_info) <= 0:
+        if len(query_object_info) == 0:
             return []
-            raise ValueError("Invalid image. No object classes could be found.")
-        
         scores_and_images = {}
         class_names = query_object_info.keys()
         for class_name in class_names:
@@ -42,11 +40,11 @@ class FasterRCNN():
                 for image_path in self.database.object_predictions[class_name]:
                     num_img_objects = len(self.database.object_predictions[class_name][image_path])
                     num_query_objects = len(query_object_info[class_name])
-                    object_diff_score = 1 if num_img_objects == num_query_objects else 1/(abs(num_img_objects - num_query_objects))
+                    object_diff_score = 1/(abs(num_img_objects - num_query_objects) + 1)
                     if image_path not in scores_and_images:
                        scores_and_images[image_path] = 0
                     scores_and_images[image_path] += object_diff_score * sum(self.database.object_predictions[class_name][image_path])
-        return sorted(scores_and_images, key=lambda x: (x[2], x[1]), reverse=True)
+        return sorted(scores_and_images.items(), key=lambda x: x[1], reverse=True)
     
     @staticmethod
     def parse_object_info(bboxes, scores=None, labels=None, thresh=0.5,
