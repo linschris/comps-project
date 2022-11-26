@@ -41,7 +41,7 @@ def grab_all_image_paths(image_dir: str, extensions: list[str] = ['/*.*']) -> li
         image_paths.extend(glob.glob(image_dir + extension))
     return image_paths
 
-def grab_images_and_paths(image_dir: str, image_paths: list[str] = [], num_images: int = 0) -> tuple[list[str], list[np.ndarray]]:
+def grab_images_and_paths(image_dir: str, image_paths: list[str] = [], num_images: int = 0, start_index = 0) -> tuple[list[str], list[np.ndarray]]:
     """Grab either a specific number (if num_images is not None) or all the images from a
     directory you specify. 
     
@@ -66,6 +66,9 @@ def grab_images_and_paths(image_dir: str, image_paths: list[str] = [], num_image
     curr_index, num_loaded_images = 0, 0
     for path, dirs, files in os.walk(image_dir, topdown=True):
         for image_file_path in files:
+            if curr_index < start_index:
+                curr_index += 1
+                continue
             curr_image_path = os.path.join(f'{path}/{image_file_path}')
             if curr_image_path not in image_paths:
                 try:
