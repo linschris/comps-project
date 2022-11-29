@@ -71,11 +71,14 @@ class Prediction {
     createTimeDiv(times, videoFrame) {
         let timeDiv = document.createElement('div')
         timeDiv.classList.add('video-relevant-times')
+        timeDiv.classList.add('flex-center-items')
+        times.sort()
         times.forEach(time => {
             let currTimeItem = document.createElement('button')
             currTimeItem.textContent = convertTimeFormat(time)
             // Hacky, but will go to time in video upon click only using IFrames
-            currTimeItem.onclick = () => { videoFrame.src = `${videoFrame.src}?start=${time}&&autoplay=1` }
+            let currentVideoSource = `${videoFrame.src}?start=${time}&&autoplay=1`
+            currTimeItem.onclick = (e) => { videoFrame.src = currentVideoSource }
             timeDiv.appendChild(currTimeItem)
         })
         return timeDiv

@@ -19,6 +19,20 @@
     </div>
     <form id="image-upload-form" class="flex-center-items" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>
+      <div class="flex-center-items" style="flex-direction: column;">
+        <div class="flex-center-items">
+          <input type="checkbox" name="model" value="AX_MODEL">
+          <label type="checkbox">CNN</label>
+        </div>
+        <div class="flex-center-items">
+          <input type="checkbox" name=model value="RMAC_MODEL">
+          <label type="checkbox">CNN + RMAC</label>
+        </div>
+        <div class="flex-center-items">
+          <input type="checkbox" name=model id="RCNN_MODEL">
+          <label type="checkbox">(RCNN) Object Detection Model</label>
+        </div>
+      </div> 
       <input type="submit" />
     </form>
     {% if b64_preview_image %}
