@@ -14,28 +14,22 @@
   </head>
   <body>
     <div id="header" class="center-text">
-      <h1 id="title">YouTube Image Search</h1>
-      <h3 class="subtitle" style="color: rgb(97, 97, 97); font-weight: normal;">Find YouTube Videos All Through Images!</h3>
+      <h1 id="title"><span class="youtube-red">YouTube</span> Image Search</h1>
+      <h3 class="subtitle" style="color: rgb(97, 97, 97); font-weight: normal;">Find YouTube Videos Using Only Images!</h3>
     </div>
+    <hr class="divider">
     <form id="image-upload-form" class="flex-center-items" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>
-      <div class="flex-center-items" style="flex-direction: column;">
-        <div class="flex-center-items">
-          <input type="checkbox" name="model" value="AX_MODEL">
-          <label type="checkbox">CNN</label>
-        </div>
-        <div class="flex-center-items">
-          <input type="checkbox" name=model value="RMAC_MODEL">
-          <label type="checkbox">CNN + RMAC</label>
-        </div>
-        <div class="flex-center-items">
-          <input type="checkbox" name=model id="RCNN_MODEL">
-          <label type="checkbox">(RCNN) Object Detection Model</label>
-        </div>
-      </div> 
+      <select name="compute_models" class="model-dropdown" id="premodel-picker">
+        <option value="AX_MODEL">CNN</option>
+        <option value="RMAC_MODEL">CNN + RMAC</option>
+        <option value="RCNN_MODEL">RCNN</option>
+        <option value="ALL">All Models</option>
+      </select>
       <input type="submit" />
     </form>
     {% if b64_preview_image %}
+      <hr class="divider">
         <div id="image-preview" class="flex-center-items">
             <h3 class="subtitle">Predicted on:</h3>
             <img src="{{ b64_preview_image }}" />

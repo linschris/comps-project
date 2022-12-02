@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: whitesmoke;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 16px;
 }
@@ -12,6 +11,18 @@ body {
 
 .center-text {
     text-align: center;
+}
+
+.youtube-red {
+    color: rgb(252, 76, 76);
+}
+
+.divider {
+    width: 60%;
+    max-width: 600px;
+    border: none;
+    height: 3px;
+    background-color:rgb(47, 47, 69);
 }
 
 .flex-center-items {
@@ -36,7 +47,20 @@ body {
 
 #image-preview > img {
     width: 50%;
+    max-width: 600px;
     height: auto;
+    border-radius: 0.25rem;
+}
+
+#image-upload-form {
+    padding: 1.5rem;
+}
+
+#premodel-picker {
+    width: 10%;
+    min-width: 100px;
+    font-size: 1rem;
+    margin-right: 1rem;
 }
 
 #yt-embed-links, #ground-truth {
@@ -63,15 +87,14 @@ button:hover {
     padding: 1rem;
 }
 
-#found-header > select {
-    border: 1.5px rgb(149, 148, 148);
+.model-dropdown {
+    border: 1.5px solid rgb(184, 184, 184);
     cursor: pointer;
     border-radius: 0.5rem;
-    border-right: 0.5rem solid transparent; /* Add padding for dropdown arrow */
     padding: 0.25rem;
     padding-right: 0.5rem;
     font-size: 1.5rem;
-    color: rgb(97, 96, 96);
+    color: rgb(0, 0, 0);
 }
 
 .video-container {
@@ -86,6 +109,7 @@ button:hover {
     width: 90%;
     height: 90%; /* Allow space for relevant times */
     border: 0;
+    border-radius: 0.25rem;
 }
 
 .video-relevant-times {

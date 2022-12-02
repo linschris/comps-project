@@ -33,6 +33,16 @@ def initialize_ui():
     if request.method == 'POST':
         imagefile = request.files['imagefile'].read()
         im_request_file = request.files.get('imagefile', '')
+        if not im_request_file:
+            # Invalid, reload page
+            return render_template('index.html', b64_preview_image=b64_preview_image, yt_links=top_yt_links)
+        # Determine models selected to compute the images
+        curr_model_select = request.form.get("compute_models")
+        curr_models = []
+        if curr_model_select != "ALL":
+            curr_models.append(globals()[curr_model_select])
+        else:
+            curr_models = [AX_MODEL, RMAC_MODEL, RCNN_MODEL]
         ext = '.' + im_request_file.filename.split('.')[1]
         with tempfile.NamedTemporaryFile(suffix=ext, mode='w+b', dir="interface/static/images", delete=True) as temp_img_file:
             temp_img_file.write(imagefile)
@@ -43,8 +53,9 @@ def initialize_ui():
             b64_image = base64.b64encode(buffer).decode('utf-8')
             b64_preview_image = f'data:image/jpg;base64, {b64_image}'
             # Query the models and get each model's guess at the most related YouTube Videos
-            top_yt_links = query_image(temp_img_file.name, [AX_MODEL, RMAC_MODEL, RCNN_MODEL], 10)
+            top_yt_links = query_image(temp_img_file.name, curr_models, 10)
     return render_template('index.html', b64_preview_image=b64_preview_image, yt_links=top_yt_links)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
