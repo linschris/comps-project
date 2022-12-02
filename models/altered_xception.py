@@ -5,6 +5,7 @@ from sklearn import preprocessing
 from sklearn.decomposition import PCA
 from database import Database
 from utils import get_and_resize_image
+import time
 
 class AlteredXception:
     """An altered model of the pre-trained Xception Model, which has the fully-connected (or more) layers chopped off to extract the feature maps or other outputs."""
@@ -112,10 +113,14 @@ class AlteredXception:
         if not isinstance(self.database, Database):
             raise ValueError("Invalid Instance Of Xception. Please initalize this model with a database.")
         query_fv = self.predict_image_from_path(query_img_path)
+        t0 = time.time()
         distances = []
         for image_path in self.database.prediction_image_paths.keys():
             curr_index = self.database.prediction_image_paths[image_path]
             curr_fv = self.database.predictions[curr_index]
             dist = np.linalg.norm(query_fv - curr_fv)
             distances.append([image_path, dist])   
+        calc = sorted(distances, key=lambda x: x[1])
+        t1 = time.time()
+        print(t1 - t0)
         return sorted(distances, key=lambda x: x[1])

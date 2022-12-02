@@ -1,6 +1,7 @@
 from gluoncv import model_zoo, data
 import mxnet as mx
 from database import Database
+import time
 
 class FasterRCNN():
     ''' Object Detection Model, where the predictions consists of object classes, locations, and their bounding boxes, as opposed to a feature vector.'''
@@ -33,6 +34,7 @@ class FasterRCNN():
         box_ids[0], class_names=self.model.classes)
         if len(query_object_info) == 0:
             return []
+        t0 = time.time()
         scores_and_images = {}
         class_names = query_object_info.keys()
         for class_name in class_names:
@@ -44,6 +46,9 @@ class FasterRCNN():
                     if image_path not in scores_and_images:
                        scores_and_images[image_path] = 0
                     scores_and_images[image_path] += object_diff_score * sum(self.database.object_predictions[class_name][image_path])
+        calc = sorted(scores_and_images.items(), key=lambda x: x[1], reverse=True)
+        t1 = time.time()
+        print(t1-t0)
         return sorted(scores_and_images.items(), key=lambda x: x[1], reverse=True)
     
     @staticmethod

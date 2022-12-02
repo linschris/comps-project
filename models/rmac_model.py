@@ -10,6 +10,7 @@ from roi_pooling import RoiPooling
 from altered_xception import AlteredXception
 import numpy as np
 from utils import get_and_resize_image
+import time
 
 class RMACModel:
     def __init__(self, conv_fm_shape: tuple, region_param: int, database: Database = None) -> None:
@@ -38,12 +39,16 @@ class RMACModel:
     def query_image(self, query_image_path):
         query_img = get_and_resize_image(query_image_path, self.model.input_shape[0][1:])
         query_fv = self.model.predict([query_img, np.expand_dims(self.regions, axis=0)])
+        t0 = time.time()
         distances = []
         for image_path in self.database.rmac_prediction_image_paths.keys():
             curr_index = self.database.rmac_prediction_image_paths[image_path]
             curr_fv = self.database.rmac_predictions[curr_index]
             dist = np.linalg.norm(query_fv - curr_fv)
-            distances.append([image_path, dist])   
+            distances.append([image_path, dist])  
+        calc = sorted(distances, key=lambda x: x[1])
+        t1 = time.time()
+        print(t1 - t0) 
         return sorted(distances, key=lambda x: x[1])
 
 '''RMAC Model Creation Methods'''
