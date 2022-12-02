@@ -26,6 +26,13 @@
         <option value="RCNN_MODEL">RCNN</option>
         <option value="ALL">All Models</option>
       </select>
+      <select name="database" class="model-dropdown" id="premodel-picker">
+        <option value="DATABASE">Large Database</option>
+        <option value="DOG_DB">Dog Database</option>
+        <option value="GAMES_DB">Game Database</option>
+        <option value="ART_DB">Art Database</option>
+        <option value="LECTURE_DB">Lecture Database</option>
+      </select>
       <input type="submit" />
     </form>
     {% if b64_preview_image %}
@@ -37,7 +44,7 @@
     {% endif %}
     {% if yt_links %}
       <div id="found-header" class="flex-center-items">
-        <h3 id="found-header-title" class="subtitle">Found (Most To Least Related):</h4>
+        <h3 id="found-header-title" class="subtitle">Found (Most To Least Related):</h3>
       </div>
       <div id="yt-embed-links" class="flex-center-items"></div>
     {% endif %}
