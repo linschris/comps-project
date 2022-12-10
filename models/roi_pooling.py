@@ -2,7 +2,10 @@ from tensorflow.python.keras.layers import Layer
 import keras.backend as K
 
 class RoiPooling(Layer):
-    """ROI pooling layer for 2D inputs.
+    """
+    Not my original code. Please refer to authors as written and corresponding paper written below.
+
+    ROI pooling layer for 2D inputs.
     See Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition,
     K. He, X. Zhang, S. Ren, J. Sun
     # Arguments
@@ -23,7 +26,6 @@ class RoiPooling(Layer):
         3D tensor with shape:
         `(1, num_rois, channels * sum([i * i for i in pool_list])`
     """
-
     def __init__(self, pool_list, num_rois, **kwargs):
 
         self.dim_ordering = K.image_data_format()

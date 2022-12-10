@@ -28,6 +28,7 @@ class RMACModel:
         return self.predict_images(image)
 
     def predict_images(self, images):
+        '''To predict the images, we resize the images to fit the model's input shape, compute the "description" of the image, and append the feature vector to a list, before converting it to a big numpy array which is returned.'''
         curr_fvs = []
         for image in images:
             image = np.reshape(image, (1, 299, 299, 3))
@@ -36,6 +37,7 @@ class RMACModel:
         return np.concatenate(curr_fvs, axis=0)
     
     def query_image(self, query_image_path):
+        '''Queries image similar to the AlteredXception Model, by using Euclidean distance and returning the closest (in distance) first in the list.'''
         query_img = get_and_resize_image(query_image_path, self.model.input_shape[0][1:])
         query_fv = self.model.predict([query_img, np.expand_dims(self.regions, axis=0)])
         distances = []

@@ -25,7 +25,7 @@ using only images and no text (including metadata from the image). The project u
 1. Clone the repo
 
 ```sh 
-    git clone https://github.com/linschris/clustering-algorithms.git
+    git clone https://github.com/linschris/youtube-image-search.git
 ```
 
 2. Install the dependencies

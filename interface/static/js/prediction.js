@@ -86,6 +86,7 @@ class Prediction {
 }
 
 function convertTimeFormat(seconds) {
+    // Convert the pure seconds time string to something more human-readable
     let numSeconds = parseInt(seconds);
     let numHours;
     let numMinutes;

@@ -94,12 +94,21 @@ def grab_images_and_paths(image_dir: str, image_paths: list[str] = [], num_image
 # Video Utility Functions
 
 def get_youtube_urls(image_scores, k):
+    """Based on the scores of the images, grab the most relevant YouTube videos, in the form of embed URLs (to show on iframes). If we grab a frame, append the relevant time as well.
+
+    Args:
+        image_scores (list): A list of sorted image scores, in terms of relevance.
+        k (int): The number of relevant YouTube videos to grab (top-k)
+
+    Returns:
+        JSON: A map, mapping a YouTube embed url, to relevant times (if there are any) of the video.
+    """
     youtube_urls = {}
     for element in image_scores:
         image_path, score = element[0], element[1]
         yt_url, time_str = get_yt_embed_url(image_path)
         if yt_url not in youtube_urls:
-            youtube_urls[yt_url] = [] # May change to set
+            youtube_urls[yt_url] = []
             if len(youtube_urls) >= k:
                 break
         if time_str:
@@ -107,6 +116,13 @@ def get_youtube_urls(image_scores, k):
     return youtube_urls
 
 def get_yt_embed_url(image_path: str) -> tuple([str, int]):
+    """Determines the YouTube Embed URL from information on the image path string. 
+    Args:
+        image_path (str): A string of the location of the image path (inside the file system).
+
+    Returns:
+        tuple: A tuple containing the embed url AND/OR a time string (in seconds) of the relevant time if the image is a frame.
+    """
     image_path = image_path.split("/")[-1] # We only want the last part of the path
     video_id = image_path[0:11]
     video_embed_url = f'https://www.youtube.com/embed/{video_id}'
@@ -114,19 +130,3 @@ def get_yt_embed_url(image_path: str) -> tuple([str, int]):
         curr_time_str = int(image_path[-9:-4])
         return video_embed_url, curr_time_str
     return video_embed_url, None
-
-def resize_images(image_dir, new_image_dir):
-    from PIL import Image
-    import os, sys
-
-    path = image_dir
-    dirs = os.listdir( path )
-    for item in dirs:
-        img_path = f'{path}/{item}'
-
-        if os.path.isfile(img_path):
-            im = Image.open(img_path)
-            f, e = os.path.splitext(img_path)
-            imResize = im.resize((299,299), Image.ANTIALIAS)
-            f = f'{f.split("/")[-1].split(".")[0]}'
-            imResize.save(f'{new_image_dir}/{f+e}', 'JPEG', quality=90)
