@@ -5,9 +5,12 @@ import os
 
 # Constants
 DATABASE_PATH = os.path.join(os.getcwd(), "data", "predictions")
-EVAL_DB_PATH = os.path.join(os.getcwd(), "eval", "predictions")
-DOG_DB_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/eval/dog-predictions"
-CAT_DB_PATH = "/Users/lchris/Desktop/Coding/schoolprojects/comp490/COMPS/data/eval/cat-predictions"
+EVAL_PATH = os.path.join(os.getcwd(), "eval", "test_images")
+# Evaluation, i.e. test, database paths
+DOG_DB_PATH = os.path.join(EVAL_PATH, "test_dogs", "predictions")
+GAMES_DB_PATH = os.path.join(EVAL_PATH, "test_games", "predictions")
+ART_DB_PATH = os.path.join(EVAL_PATH, "test_art", "predictions")
+LECTURE_DB_PATH = os.path.join(EVAL_PATH, "test_lecture", "predictions")
 
 def get_and_resize_image(image_path: str, resize_shape: tuple) -> np.ndarray:
     """Load and resize a image to match a input shape, normally a model input shape.

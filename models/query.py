@@ -15,7 +15,7 @@ def query_image(query_img_path: str, models: list, k=5) -> dict:
     """
     model_outputs = {}
     for model in models:
-        model_name = type(model).__name__
+        model_name = get_model_name(type(model).__name__)
         query_image_method = getattr(model, "query_image")
         if callable(query_image_method): # If query_image method exists and is callable in model
             image_scores = model.query_image(query_img_path)
@@ -24,3 +24,7 @@ def query_image(query_img_path: str, models: list, k=5) -> dict:
         else:
             print(f"{model_name} could not query the image.")
     return model_outputs
+
+def get_model_name(model_class_name):
+    true_class_names = {"AlteredXception": "CNN", "RMACModel": "CNN + RMAC", "FasterRCNN": "RCNN"}
+    return true_class_names.get(model_class_name, "Unknown Model")

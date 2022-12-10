@@ -68,8 +68,7 @@ def run_yt_reqs_async(tf_record_data: dict, yt_id_reqs: list, session: FuturesSe
                 yt_id = curr_response.text[10:21]
                 # video_labels = tf_record_data[fake_id]
                 # tf_record_data[yt_id] = [video_labels]
-                tf_record_data[yt_id] = download_yt_thumbnail(
-                    yt_id, download_dir)
+                tf_record_data[yt_id] = download_yt_thumbnail(yt_id, download_dir)
             del tf_record_data[fake_id]
     return tf_record_data
 

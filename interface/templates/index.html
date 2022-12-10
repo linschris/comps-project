@@ -21,10 +21,10 @@
     <form id="image-upload-form" class="flex-center-items" method="post" action="/" enctype="multipart/form-data">
       <input type="file" name="imagefile" id="imagefile"/>
       <select name="compute_models" class="model-dropdown" id="premodel-picker">
+        <option value="ALL">All Models</option>
         <option value="AX_MODEL">CNN</option>
         <option value="RMAC_MODEL">CNN + RMAC</option>
         <option value="RCNN_MODEL">RCNN</option>
-        <option value="ALL">All Models</option>
       </select>
       <select name="database" class="model-dropdown" id="premodel-picker">
         <option value="DATABASE">Large Database</option>

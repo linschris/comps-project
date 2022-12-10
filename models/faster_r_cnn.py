@@ -10,7 +10,7 @@ class FasterRCNN():
         self.model = model_zoo.get_model('faster_rcnn_resnet50_v1b_voc', pretrained=True)
     
     def predict_image_from_path(self, image_path):
-        self.predict_image_from_paths([image_path])
+        self.predict_image_paths([image_path])
     
     def predict_image_paths(self, image_paths): # We cannot simply pass in CV2-imread images :/
         object_infos = []
