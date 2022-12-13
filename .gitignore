@@ -24,7 +24,7 @@ sift.py
 *.fls
 *.out
 *.log
-*.pdf
+paper/*.pdf
 *.run.xml
 *.synctex.gz
 

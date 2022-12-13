@@ -96,6 +96,11 @@ Finally, walk and run through the steps/cells of `evaluate.ipynb`. The results w
 
 ## Results
 
+There are two ways to view the resulting graphs:
+- This Google Sheets Link: [View Here](https://docs.google.com/spreadsheets/d/1zDshoOrzodH69RnZKt5q6c5OtIIpeP_Ue9GJazMrZbs/edit?usp=sharing)
+- Or, refer to the downloaded PDF located on this repo at `COMPS Evaluation Data.pdf`.
+
+Both of these method include the raw data, the aggregated data, and the graphs beneath which represent the bold, aggregated data above it!
 
 ## Future Work
 - Adding more models such as:
