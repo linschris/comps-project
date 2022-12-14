@@ -102,6 +102,48 @@ There are two ways to view the resulting graphs:
 
 Both of these method include the raw data, the aggregated data, and the graphs beneath which represent the bold, aggregated data above it!
 
+## Code Architecture
+
+<img src="./paper/images/Code%20Architecture.png" height=600></img>
+
+From a high level, this YouTube search tool is very simple. 
+
+### The Database
+
+After downloading the videos and grabbing the thumbnails and frames from them (as in the above sections), we compute the "descriptions" (with all the models) and create the database utilizing `gather_predictions.py` which utilizes the __Database__ class at `database.py`. 
+- The models (located in the `/models` folder) compute the description using these methods:
+    - `predict_images()` (AlteredXception, RMAC)
+    - `predict_image_paths()` (FasterRCNN)
+- These descriptions will be stored on the file directory (`/data` relatively to parent) where they can be fetched and queried by the search tool. 
+- As well as, frames are stored with their corresponding frame number to determine the corresponding relevant time (of the video) when they are fetched.
+
+### The Models
+
+All the models are stored in the `/models` folder. The three models are:
+- Base Convolutional Neural Network: `altered_xception.py`
+- Convolutional Neural Network + RMAC: `faster_r_cnn.py`
+
+There are classes to make them easy to organize the complex functions and to make computing the descriptions, querying their databases, and returning their picks for related videos very systematic (as they can share common function names such as `predict_images` and `query_image`).
+
+### Querying 
+
+When computing the user query image, we use the same models (from the `/models` folder) to compute the description of the query image. These descriptions are compared (per model) within the `query_image()` class function for each of the models!
+
+To get the relevant videos (in links), we grab the video ids and corresponding times and convert them to embed links (to be used in HTML iframes to view the video in the web application) within the `get_youtube_urls()` function in `utils.py`.
+
+### The Interface
+
+<img src="./paper/images/ui_form.png" height=600></img>
+<img src="./paper/images/ui_predictions.png" height=600></img>
+
+To make the search tool interactable (and easy-to-use), a user interface is created within the `/interface` folder with [Flask](https://flask.palletsprojects.com/en/2.2.x/), [HTML, CSS, and JS](https://blog.hubspot.com/marketing/web-design-html-css-javascript). When a user submits a query image:
+- The image gets passed to the `query_image` method within `query.py` in the models folder
+- The models compute the descriptions, compare and query their database with their `query_image` methods
+- Return the relevant videos back to the web server
+    - Using HTML, CSS, and Javascript in `/interface/static`, we create a nice UI to view the relevant videos and clickable buttons to view the video at relevant times!
+
+Additionally, to showcase and make sure the user queried the correct image, an image preview of the query image is provided after the user submits a query image. To accomplish this, the image is converted to base64 and showcased in an image div, so we can temporarily store the image on the file directory (and not have to store it beyond the length of the web session).
+
 ## Future Work
 - Adding more models such as:
     - SIFT / SURF / RootSIFT
