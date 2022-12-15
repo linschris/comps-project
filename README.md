@@ -10,7 +10,7 @@ using only images and no text (including metadata from the image). The project u
 
 ### Requirements
 
-#### Language: `Python 3.9.1` (Use Python 3.7 <= Python 3.x < Python 3.11)
+#### Languages: `Python 3.9.1` (Use Python 3.7 <= Python 3.x < Python 3.11), `HTML-CSS-JS`
 
 #### Dependencies: Refer to Step 2 Of Installation Or `requirements.txt` of this repository.
 
